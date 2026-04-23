@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ETICOM PrintControl SGC</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F5F5F3;--bg2:#EBEBEA;--bg3:#E0E0DE;
+  --surface:#FFFFFF;--border:#D4D4D2;--border2:#E8E8E6;
+  --text:#1A1A1A;--text2:#6B6B69;--text3:#9B9B99;
+  --blue:#2563EB;--blue-bg:#EFF6FF;--blue-border:#BFDBFE;--blue-text:#1D4ED8;
+  --green:#16A34A;--green-bg:#F0FDF4;--green-border:#BBF7D0;--green-text:#15803D;
+  --amber:#D97706;--amber-bg:#FFFBEB;--amber-border:#FDE68A;--amber-text:#92400E;
+  --red:#DC2626;--red-bg:#FEF2F2;--red-border:#FECACA;--red-text:#991B1B;
+  --violet:#7C3AED;--violet-bg:#F5F3FF;--violet-border:#DDD6FE;--violet-text:#5B21B6;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
+  --shadow-md:0 4px 6px rgba(0,0,0,.07),0 2px 4px rgba(0,0,0,.06);
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;color:var(--text);background:var(--bg);line-height:1.5}
+.screen{display:none}.screen.active{display:flex;flex-direction:column;min-height:100vh}
+/* LOGIN */
+.login-wrap{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#EFF6FF 0%,#F5F3FF 50%,#F0FDF4 100%)}
+.login-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:36px;width:360px;box-shadow:var(--shadow-md)}
+.login-logo{text-align:center;margin-bottom:28px}
+.login-logo img{height:48px;object-fit:contain;margin-bottom:10px}
+.login-badge{display:inline-block;font-size:10px;font-weight:600;color:var(--blue-text);background:var(--blue-bg);border:1px solid var(--blue-border);padding:3px 10px;border-radius:99px;letter-spacing:.04em}
+.login-title{font-size:18px;font-weight:700;margin-bottom:4px;text-align:center}
+.login-sub{font-size:12px;color:var(--text2);text-align:center;margin-bottom:24px}
+.login-err{font-size:12px;color:var(--red);text-align:center;margin-top:8px;display:none}
+/* APP */
+.app-layout{display:flex;flex:1;min-height:100vh}
+.sidebar{width:220px;background:var(--surface);border-right:1px solid var(--border2);display:flex;flex-direction:column;flex-shrink:0}
+.sb-logo{padding:14px 16px;border-bottom:1px solid var(--border2);display:flex;align-items:center;gap:10px}
+.sb-logo img{height:28px;object-fit:contain}
+.sb-logo-t{font-size:12px;font-weight:700}
+.sb-logo-s{font-size:9px;color:var(--text3);letter-spacing:.04em}
+.sb-user{padding:10px 16px;border-bottom:1px solid var(--border2);margin-bottom:6px}
+.sb-name{font-size:12px;font-weight:600}
+.sb-role{margin-top:4px}
+.rp{display:inline-block;font-size:10px;padding:2px 8px;border-radius:99px;font-weight:600}
+.rp-v{background:var(--violet-bg);color:var(--violet-text);border:1px solid var(--violet-border)}
+.rp-c{background:var(--blue-bg);color:var(--blue-text);border:1px solid var(--blue-border)}
+.nav-it{display:flex;align-items:center;gap:8px;padding:8px 16px;font-size:12px;color:var(--text2);cursor:pointer;transition:all .15s;border-radius:6px;margin:1px 8px}
+.nav-it:hover{background:var(--bg2);color:var(--text)}
+.nav-it.active{background:var(--blue-bg);color:var(--blue-text);font-weight:600}
+.nav-sep{font-size:9px;color:var(--text3);padding:12px 16px 4px;text-transform:uppercase;letter-spacing:.07em;font-weight:600}
+.sb-bot{margin-top:auto;padding:12px 16px;border-top:1px solid var(--border2)}
+.main{flex:1;overflow-y:auto;padding:20px;background:var(--bg)}
+.page{display:none}.page.active{display:block}
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:18px;margin-bottom:14px;box-shadow:var(--shadow)}
+.ct{font-size:13px;font-weight:600;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;color:var(--text)}
+.ph{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.pt{font-size:17px;font-weight:700}
+/* STATS */
+.sg{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.sc{background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:14px;box-shadow:var(--shadow)}
+.sl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;font-weight:600}
+.sv{font-size:26px;font-weight:700;line-height:1}
+.ss{font-size:10px;color:var(--text3);margin-top:4px}
+/* TABLE */
+table{width:100%;border-collapse:collapse}
+th{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;padding:9px 12px;text-align:left;border-bottom:1px solid var(--border2);background:var(--bg)}
+td{font-size:12px;color:var(--text);padding:10px 12px;border-bottom:1px solid var(--border2);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr.cr:hover td{background:var(--bg2);cursor:pointer}
+/* BADGES */
+.badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px}
+.b-ab{background:var(--amber-bg);color:var(--amber-text);border:1px solid var(--amber-border)}
+.b-pr{background:var(--blue-bg);color:var(--blue-text);border:1px solid var(--blue-border)}
+.b-cl{background:var(--green-bg);color:var(--green-text);border:1px solid var(--green-border)}
+.b-nu{background:var(--violet-bg);color:var(--violet-text);border:1px solid var(--violet-border)}
+.b-tp{background:var(--bg2);color:var(--text2);border:1px solid var(--border);font-size:10px}
+/* FORMS */
+.fg{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.fg label{font-size:10px;color:var(--text2);font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fr3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+input,select,textarea{font-size:13px;font-family:inherit;width:100%;border:1px solid var(--border);border-radius:8px;padding:8px 10px;background:var(--surface);color:var(--text);outline:none;transition:border .15s}
+input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+input[readonly]{background:var(--bg2);color:var(--text2)}
+textarea{resize:vertical;min-height:60px}
+/* BUTTONS */
+.btn{padding:8px 16px;font-size:13px;font-weight:500;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap}
+.btn:hover{background:var(--bg2)}
+.btn-p{background:var(--blue);color:#fff;border-color:var(--blue)}.btn-p:hover{background:#1D4ED8}
+.btn-s{background:var(--green);color:#fff;border-color:var(--green)}.btn-s:hover{background:#15803D}
+.btn-w{background:var(--amber-bg);color:var(--amber-text);border-color:var(--amber-border)}.btn-w:hover{background:var(--amber-border)}
+.btn-d{background:var(--red-bg);color:var(--red-text);border-color:var(--red-border)}.btn-d:hover{background:var(--red-border)}
+.btn-sm{padding:4px 10px;font-size:11px;font-weight:500;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--text2);cursor:pointer;font-family:inherit;transition:all .15s}
+.btn-sm:hover{background:var(--bg2)}
+.btn-blk{width:100%;text-align:center;margin-top:6px}
+/* CHIPS */
+.chi{display:inline-flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:6px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface);transition:all .15s;margin:3px}
+.chi:hover{background:var(--bg2)}
+.chi.ck{background:var(--blue-bg);color:var(--blue-text);border-color:var(--blue-border);font-weight:500}
+/* PRODUCT BLOCK */
+.pb{background:var(--bg);border:1px solid var(--border2);border-radius:10px;padding:16px;margin-bottom:12px}
+/* DROP ZONE */
+.dz{border:2px dashed var(--border);border-radius:10px;padding:24px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg)}
+.dz:hover,.dz.ov{background:var(--blue-bg);border-color:var(--blue)}
+/* EV GRID */
+.eg{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px;margin-top:10px}
+.et{position:relative;border-radius:8px;overflow:hidden;border:1px solid var(--border);background:var(--bg2);cursor:pointer;transition:transform .15s,box-shadow .15s}
+.et:hover{transform:scale(1.03);box-shadow:var(--shadow-md)}
+.et img{width:100%;height:84px;object-fit:cover;display:block}
+.etp{width:100%;height:84px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+.etn{font-size:9px;color:var(--text3);padding:4px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:var(--bg2);border-top:1px solid var(--border)}
+.etd{position:absolute;top:4px;right:4px;background:rgba(0,0,0,.55);color:#fff;border:none;border-radius:99px;font-size:9px;padding:2px 6px;cursor:pointer;display:none}
+.et:hover .etd{display:block}
+.epill{font-size:9px;padding:2px 6px;border-radius:99px;font-weight:600;position:absolute;top:4px;left:4px}
+.ep-i{background:#DBEAFE;color:#1E40AF}
+.ep-v{background:#FEF3C7;color:#92400E}
+.ep-a{background:#F3E8FF;color:#6B21A8}
+.ep-d{background:#D1FAE5;color:#065F46}
+.ep-o{background:var(--bg2);color:var(--text3)}
+.ecb{display:inline-flex;align-items:center;justify-content:center;background:var(--red-bg);color:var(--red-text);border-radius:99px;font-size:10px;font-weight:600;padding:1px 7px;margin-left:6px;border:1px solid var(--red-border)}
+/* ALERTS */
+.ai{background:var(--blue-bg);color:var(--blue-text);border:1px solid var(--blue-border);padding:10px 14px;border-radius:8px;font-size:12px;margin-bottom:14px}
+/* DETAIL ROW */
+.dr{display:flex;justify-content:space-between;font-size:12px;padding:6px 0;border-bottom:1px solid var(--border2)}
+.dr:last-child{border-bottom:none}
+.dl{color:var(--text2);font-weight:500}
+/* TIMELINE */
+.tl{display:flex;gap:12px;padding-bottom:14px}
+.td{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.tt{font-size:12px;line-height:1.5}
+.tf{font-size:10px;color:var(--text3)}
+/* NOTIF DOT */
+.nd{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--red);margin-left:5px;vertical-align:middle}
+.notif-pill{background:var(--blue-bg);color:var(--blue-text);border:1px solid var(--blue-border);padding:2px 8px;border-radius:99px;font-size:10px;font-weight:600}
+/* MODAL */
+.mb{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:1000;align-items:center;justify-content:center;padding:16px}
+.mb.open{display:flex}
+.md{background:var(--surface);border-radius:14px;border:1px solid var(--border);padding:24px;width:500px;max-width:97vw;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-md)}
+.mh{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px}
+.mt{font-size:15px;font-weight:700}
+.ms{font-size:11px;color:var(--text3);margin-top:2px}
+.mf{display:flex;justify-content:flex-end;gap:10px;margin-top:18px;padding-top:14px;border-top:1px solid var(--border2)}
+.sec-t{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--blue-text);background:var(--blue-bg);border:1px solid var(--blue-border);padding:3px 10px;border-radius:6px;display:inline-block;margin-bottom:12px}
+.rf{background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:8px 12px;font-size:12px;color:var(--text);margin-bottom:10px;min-height:34px}
+.rl{font-size:10px;color:var(--text2);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}
+.at-tag{font-size:9px;padding:1px 6px;border-radius:99px;background:var(--green-bg);color:var(--green-text);border:1px solid var(--green-border);margin-left:6px;font-weight:600}
+.ri{display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;margin-right:16px}
+.ri input{width:auto}
+/* LIGHTBOX */
+.lb{display:none;position:fixed;inset:0;background:rgba(0,0,0,.94);z-index:9999;align-items:center;justify-content:center;flex-direction:column}
+.lb.open{display:flex}
+.lbcl{position:absolute;top:16px;right:20px;font-size:28px;color:#fff;cursor:pointer;background:none;border:none;opacity:.7;line-height:1}
+.lbcl:hover{opacity:1}
+.lbi{max-width:88vw;max-height:78vh;border-radius:10px;object-fit:contain}
+.lbpl{display:flex;flex-direction:column;align-items:center;gap:12px;color:#fff;text-align:center}
+.lbpl-ic{font-size:64px}
+.lbtb{display:flex;align-items:center;gap:16px;margin-top:16px}
+.lbnv{background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:99px;font-size:22px;padding:6px 18px;cursor:pointer}
+.lbnv:hover{background:rgba(255,255,255,.3)}
+.lbco{font-size:12px;color:rgba(255,255,255,.6)}
+.lbnm{font-size:13px;color:rgba(255,255,255,.85);max-width:300px;text-align:center;word-break:break-all;margin-top:8px}
+/* PRINT */
+.prbg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:2000;align-items:flex-start;justify-content:center;overflow-y:auto;padding:16px 0}
+.prbg.open{display:flex}
+.prm{background:#fff;width:740px;max-width:97vw;border-radius:12px;overflow:hidden;box-shadow:var(--shadow-md)}
+.prt{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:#f5f5f5;border-bottom:1px solid #ddd;position:sticky;top:0;z-index:10}
+.prt span{font-size:14px;font-weight:600;color:#333}
+/* CATALOGO */
+.cat-item{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:var(--bg);border:1px solid var(--border2);border-radius:8px;margin-bottom:6px;font-size:12px;font-weight:500}
+/* BARS */
+.br{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.bl{font-size:12px;color:var(--text2);width:160px;flex-shrink:0}
+.bb{flex:1;background:var(--bg2);border-radius:99px;height:8px}
+.bf{height:8px;border-radius:99px}
+.bv{font-size:12px;color:var(--text2);width:24px;text-align:right;font-weight:600}
+</style>
+</head>
+<body>
+
+
+<!-- ===== SUPABASE SDK ===== -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// ============================================================
+// CONFIGURACIÓN — reemplazar con tus valores de Supabase
+// ============================================================
+const SUPABASE_URL = https://sapjrbqsjpwosxxlodwa.supabase.co/rest/v1/;         // ej: https://abcdef.supabase.co
+const SUPABASE_ANON_KEY = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhcGpyYnFzanB3b3N4eGxvZHdhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NDY4MzUsImV4cCI6MjA5MjUyMjgzNX0.cPR4ULaVVU-DVB6lm2ckY9JCwKisZcLL-322HjiMc3I; // Project Settings > API > anon key
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+</script>
+
+<!-- LOGO B64 -->
+<script>
+const L64='data:image/jpeg;base64,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';
+</script>
+
+<!-- ===== LOGIN ===== -->
+<div class="screen active" id="sc-login">
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="login-logo">
+        <img src="" id="ll" alt="ETICOM"><br>
+        <span class="login-badge">PrintControl SGC</span>
+      </div>
+      <div class="login-title">Bienvenido</div>
+      <div class="login-sub">Sistema de Gestión de Rechazos · ETICOM S.A de C.V.</div>
+      <div class="fg"><label>Usuario</label><input type="text" id="lu" placeholder="usuario@eticom.mx"></div>
+      <div class="fg"><label>Contraseña</label><input type="password" id="lp" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <button class="btn btn-p btn-blk" onclick="doLogin()">Iniciar sesión</button>
+      <div class="login-err" id="le">Usuario o contraseña incorrectos</div>
+      <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border2)">
+        <div style="font-size:10px;color:var(--text3);text-align:center;margin-bottom:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em">Acceso rápido — Demo</div>
+        <div style="display:flex;gap:8px">
+          <button class="btn" style="flex:1;font-size:12px" onclick="qL('vendedor')">🧑 Vendedor</button>
+          <button class="btn" style="flex:1;font-size:12px" onclick="qL('calidad')">🔬 Calidad</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== VENDEDOR ===== -->
+<div class="screen" id="sc-v">
+  <div class="app-layout">
+    <div class="sidebar">
+      <div class="sb-logo"><img id="vl" alt="E"><div><div class="sb-logo-t">PrintControl</div><div class="sb-logo-s">ETICOM · SGC</div></div></div>
+      <div class="sb-user"><div class="sb-name" id="vun">—</div><div class="sb-role"><span class="rp rp-v">Vendedor</span></div></div>
+      <div class="nav-it active" id="vn0" onclick="vNav('d',this)">⊞ Mi dashboard</div>
+      <div class="nav-it" id="vn1" onclick="vNav('n',this);initN()">＋ Nuevo rechazo</div>
+      <div class="nav-it" id="vn2" onclick="vNav('m',this);renderVM()">📋 Mis casos</div>
+      <div class="sb-bot"><button class="btn btn-sm" style="width:100%" onclick="logout()">Cerrar sesión</button></div>
+    </div>
+    <div class="main">
+      <!-- DASHBOARD V -->
+      <div class="page active" id="vp-d">
+        <div class="ph"><div class="pt">Mi dashboard</div><div style="font-size:11px;color:var(--text3);font-weight:600">Abril 2026</div></div>
+        <div class="sg">
+          <div class="sc"><div class="sl">Mis rechazos</div><div class="sv" id="vs0">—</div><div class="ss">Registrados</div></div>
+          <div class="sc"><div class="sl">Abiertos</div><div class="sv" style="color:var(--amber)" id="vs1">—</div><div class="ss">Sin atender</div></div>
+          <div class="sc"><div class="sl">En proceso</div><div class="sv" style="color:var(--blue)" id="vs2">—</div><div class="ss">Calidad actúa</div></div>
+          <div class="sc"><div class="sl">Cerrados</div><div class="sv" style="color:var(--green)" id="vs3">—</div><div class="ss">Resueltos</div></div>
+        </div>
+        <div class="card">
+          <div class="ct">Actividad reciente <span id="vnd"></span></div>
+          <table><thead><tr><th>Folio</th><th>Cliente</th><th>Tipo producto</th><th>Evidencias</th><th>Fecha</th><th>Estado</th><th>Actualización de calidad</th></tr></thead>
+          <tbody id="vdt"></tbody></table>
+        </div>
+      </div>
+      <!-- NUEVO RECHAZO -->
+      <div class="page" id="vp-n">
+        <div class="ph"><div class="pt">Registrar nuevo rechazo</div></div>
+        <div class="ai">📤 Al enviar, el reporte y las evidencias serán visibles inmediatamente en el dashboard de Calidad.</div>
+        <div class="card">
+          <div class="ct">Datos generales</div>
+          <div class="fr">
+            <div class="fg"><label>Vendedor / Gerente de proyecto</label><input type="text" id="nv0" readonly></div>
+            <div class="fg"><label>Mesa de control</label><select id="nv1"><option value="">— Seleccionar persona —</option></select></div>
+          </div>
+          <div class="fr">
+            <div class="fg"><label>Fecha de detección</label><input type="date" id="nv2"></div>
+            <div class="fg"><label>Cliente</label><input type="text" id="nv3" placeholder="Nombre del cliente"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="ct"><span>Productos rechazados</span><button class="btn-sm" onclick="addP()">+ Agregar producto</button></div>
+          <div id="pc"></div>
+        </div>
+        <div class="card">
+          <div class="ct">Clasificación</div>
+          <div style="margin-bottom:14px">
+            <div style="font-size:10px;color:var(--text2);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Tipo de no conformidad</div>
+            <div id="tg">
+              <label class="chi" onclick="selT(this,'RECHAZO')">⚠ Rechazo</label>
+              <label class="chi" onclick="selT(this,'QUEJA CALIDAD PRODUCTO')">📋 Queja calidad producto</label>
+              <label class="chi" onclick="selT(this,'QUEJA CALIDAD SERVICIO')">💬 Queja calidad servicio</label>
+              <label class="chi" onclick="selT(this,'QUEJA INOCUIDAD')">🔬 Queja de inocuidad</label>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:10px;color:var(--text2);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">¿Qué requiere el cliente?</div>
+            <div id="rg">
+              <label class="chi" onclick="this.classList.toggle('ck')">🔄 Reimpresión</label>
+              <label class="chi" onclick="this.classList.toggle('ck')">📦 Acondicionamiento</label>
+              <label class="chi" onclick="this.classList.toggle('ck')">✅ Acciones correctivas</label>
+              <label class="chi" onclick="this.classList.toggle('ck')">🧾 Nota de crédito</label>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="ct"><span>Evidencias <span id="evc" class="ecb" style="display:none">0</span></span><span style="font-size:11px;color:var(--text3)">Fotos · Videos · Audios · Documentos</span></div>
+          <div class="dz" id="dz" onclick="document.getElementById('fi').click()" ondragover="event.preventDefault();this.classList.add('ov')" ondragleave="this.classList.remove('ov')" ondrop="hDrop(event)">
+            <div style="font-size:24px;margin-bottom:6px">📎</div>
+            <div style="font-size:14px;font-weight:600;color:var(--text)">Arrastra archivos aquí o haz clic</div>
+            <div style="font-size:12px;color:var(--text2);margin-top:4px">Las fotos muestran miniatura — clic en cualquier archivo para verlo</div>
+            <input type="file" id="fi" multiple accept="*/*" style="display:none" onchange="hFiles(this.files)">
+          </div>
+          <div class="eg" id="eg"></div>
+        </div>
+        <div style="display:flex;gap:10px;justify-content:flex-end;margin-bottom:20px">
+          <button class="btn" onclick="vNav('d',document.getElementById('vn0'))">Cancelar</button>
+          <button class="btn btn-p" onclick="guardar()">Enviar a Calidad ✓</button>
+        </div>
+      </div>
+      <!-- MIS CASOS -->
+      <div class="page" id="vp-m">
+        <div class="ph"><div class="pt">Mis casos</div></div>
+        <div class="card"><table><thead><tr><th>Folio</th><th>Cliente</th><th>Tipo producto</th><th>Evidencias</th><th>Tipo NC</th><th>Fecha</th><th>Estado</th><th>Avance calidad</th></tr></thead><tbody id="vmt"></tbody></table></div>
+      </div>
+      <!-- DETALLE V -->
+      <div class="page" id="vp-c">
+        <div class="ph">
+          <div class="pt">Caso <span id="vcf" style="font-family:monospace;font-size:14px;color:var(--text2)"></span></div>
+          <button class="btn" onclick="vNav('m',document.getElementById('vn2'));renderVM()">← Volver</button>
+        </div>
+        <div id="vcb"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== CALIDAD ===== -->
+<div class="screen" id="sc-c">
+  <div class="app-layout">
+    <div class="sidebar">
+      <div class="sb-logo"><img id="cl" alt="E"><div><div class="sb-logo-t">PrintControl</div><div class="sb-logo-s">ETICOM · SGC</div></div></div>
+      <div class="sb-user"><div class="sb-name" id="cun">—</div><div class="sb-role"><span class="rp rp-c">Calidad · Admin</span></div></div>
+      <div class="nav-it active" id="cn0" onclick="cNav('d',this)">⊞ Dashboard</div>
+      <div class="nav-it" id="cn1" onclick="cNav('r',this);renderCR()">⚠ Todos los rechazos</div>
+      <div class="nav-sep">Administración</div>
+      <div class="nav-it" id="cn2" onclick="cNav('u',this);renderU()">👤 Usuarios</div>
+      <div class="nav-it" id="cn3" onclick="cNav('cat',this);renderCat()">📚 Catálogos</div>
+      <div class="nav-it" id="cn4" onclick="cNav('rep',this)">◫ Reportes</div>
+      <div class="sb-bot"><button class="btn btn-sm" style="width:100%" onclick="logout()">Cerrar sesión</button></div>
+    </div>
+    <div class="main">
+      <!-- DASHBOARD C -->
+      <div class="page active" id="cp-d">
+        <div class="ph"><div class="pt">Dashboard de calidad</div><div style="font-size:11px;color:var(--text3);font-weight:600">Abril 2026</div></div>
+        <div class="sg">
+          <div class="sc"><div class="sl">Total rechazos</div><div class="sv" id="cs0">—</div></div>
+          <div class="sc"><div class="sl">Sin atender</div><div class="sv" style="color:var(--amber)" id="cs1">—</div></div>
+          <div class="sc"><div class="sl">En proceso</div><div class="sv" style="color:var(--blue)" id="cs2">—</div></div>
+          <div class="sc"><div class="sl">Cerrados</div><div class="sv" style="color:var(--green)" id="cs3">—</div></div>
+        </div>
+        <div class="card"><div class="ct">Rechazos recibidos — todos los vendedores</div>
+          <table><thead><tr><th>Folio</th><th>Cliente</th><th>Vendedor</th><th>Tipo producto</th><th>Evidencias</th><th>Fecha</th><th>Estado</th><th>Acción</th></tr></thead>
+          <tbody id="cdt"></tbody></table>
+        </div>
+      </div>
+      <!-- TODOS RECHAZOS -->
+      <div class="page" id="cp-r">
+        <div class="ph"><div class="pt">Gestión de rechazos</div></div>
+        <div class="card"><table><thead><tr><th>Folio</th><th>Cliente</th><th>Vendedor</th><th>Tipo producto</th><th>Evidencias</th><th>Tipo NC</th><th>Fecha</th><th>Estado</th><th>Acción</th></tr></thead>
+        <tbody id="crt"></tbody></table></div>
+      </div>
+      <!-- DETALLE C -->
+      <div class="page" id="cp-c">
+        <div class="ph">
+          <div class="pt">Gestionar caso <span id="ccf" style="font-family:monospace;font-size:14px;color:var(--text2)"></span></div>
+          <button class="btn" onclick="cNav('r',document.getElementById('cn1'));renderCR()">← Volver</button>
+        </div>
+        <div id="ccb"></div>
+      </div>
+      <!-- USUARIOS -->
+      <div class="page" id="cp-u">
+        <div class="ph"><div class="pt">Gestión de usuarios</div><button class="btn btn-p" onclick="oM('mu')">+ Nuevo usuario</button></div>
+        <div class="card"><table><thead><tr><th>Nombre</th><th>Correo</th><th>Perfil</th><th>Estado</th><th>Acción</th></tr></thead><tbody id="ut"></tbody></table></div>
+      </div>
+      <!-- CATÁLOGOS -->
+      <div class="page" id="cp-cat">
+        <div class="ph"><div class="pt">Administración de catálogos</div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+          <div class="card">
+            <div class="ct"><span>🏷 Tipo de producto</span><button class="btn-sm" onclick="oM('mcat-tp')">+ Agregar</button></div>
+            <div id="cat-tp-list"></div>
+          </div>
+          <div class="card">
+            <div class="ct"><span>👥 Mesa de control</span><button class="btn-sm" onclick="oM('mcat-mc')">+ Agregar</button></div>
+            <div id="cat-mc-list"></div>
+          </div>
+          <div class="card">
+            <div class="ct"><span>⚠ Tipo de no conformidad</span><span style="font-size:11px;color:var(--text3)">Fijo del sistema</span></div>
+            <div class="cat-item">⚠ Rechazo</div>
+            <div class="cat-item">📋 Queja calidad producto</div>
+            <div class="cat-item">💬 Queja calidad servicio</div>
+            <div class="cat-item">🔬 Queja de inocuidad</div>
+          </div>
+          <div class="card">
+            <div class="ct"><span>📋 Requerimientos del cliente</span><span style="font-size:11px;color:var(--text3)">Fijo del sistema</span></div>
+            <div class="cat-item">🔄 Reimpresión</div>
+            <div class="cat-item">📦 Acondicionamiento</div>
+            <div class="cat-item">✅ Acciones correctivas</div>
+            <div class="cat-item">🧾 Nota de crédito</div>
+          </div>
+        </div>
+      </div>
+      <!-- REPORTES -->
+      <div class="page" id="cp-rep">
+        <div class="ph"><div class="pt">Reportes estadísticos</div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+          <div class="card"><div class="ct">Por tipo de no conformidad</div>
+            <div class="br"><div class="bl">Rechazo</div><div class="bb"><div class="bf" style="width:70%;background:var(--blue)"></div></div><div class="bv">5</div></div>
+            <div class="br"><div class="bl">Queja calidad producto</div><div class="bb"><div class="bf" style="width:28%;background:var(--green)"></div></div><div class="bv">2</div></div>
+            <div class="br"><div class="bl">Queja inocuidad</div><div class="bb"><div class="bf" style="width:14%;background:var(--amber)"></div></div><div class="bv">1</div></div>
+          </div>
+          <div class="card"><div class="ct">Por vendedor</div>
+            <div class="br"><div class="bl">Rodrigo Mejia</div><div class="bb"><div class="bf" style="width:62%;background:var(--blue)"></div></div><div class="bv">5</div></div>
+            <div class="br"><div class="bl">Ana Torres</div><div class="bb"><div class="bf" style="width:37%;background:var(--green)"></div></div><div class="bv">3</div></div>
+          </div>
+          <div class="card"><div class="ct">Por tipo de producto</div>
+            <div class="br"><div class="bl">Etiqueta</div><div class="bb"><div class="bf" style="width:62%;background:var(--blue)"></div></div><div class="bv">5</div></div>
+            <div class="br"><div class="bl">Empaque Flexible</div><div class="bb"><div class="bf" style="width:37%;background:var(--violet)"></div></div><div class="bv">3</div></div>
+            <div class="br"><div class="bl">Caja Plegadiza</div><div class="bb"><div class="bf" style="width:12%;background:var(--amber)"></div></div><div class="bv">1</div></div>
+          </div>
+          <div class="card"><div class="ct">Tiempos de respuesta</div>
+            <div style="font-size:12px;color:var(--text2)">Promedio de cierre</div>
+            <div style="font-size:28px;font-weight:700;color:var(--blue);margin:8px 0">3.2 días</div>
+            <div style="font-size:11px;color:var(--text3)">Basado en casos cerrados del mes</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODALES ===== -->
+<!-- Modal Avance -->
+<div class="mb" id="mav"><div class="md">
+  <div class="mh"><div><div class="mt">Registrar avance</div><div class="ms" id="avf-sub"></div></div><button class="btn-sm" onclick="cM('mav')">✕</button></div>
+  <div class="fg"><label>Nuevo estado</label><select id="ave"><option>Abierto</option><option>En proceso</option><option>Cerrado</option></select></div>
+  <div class="fg"><label>Causa raíz</label><select id="avc"><option value="">— Seleccionar —</option><option>Calibración de equipo</option><option>Error humano</option><option>Falla de material</option><option>Error de archivo del cliente</option><option>Condiciones ambientales</option><option>Otra</option></select></div>
+  <div class="fg"><label>Acción tomada</label><select id="ava"><option value="">— Seleccionar —</option><option>Reimpresión autorizada</option><option>Retrabajo en proceso</option><option>Nota de crédito emitida</option><option>Acondicionamiento programado</option><option>En investigación</option></select></div>
+  <div class="fg"><label>Comentario para el vendedor</label><textarea id="avm" placeholder="Este mensaje será visible inmediatamente en el dashboard del vendedor..." rows="3"></textarea></div>
+  <div class="mf"><button class="btn" onclick="cM('mav')">Cancelar</button><button class="btn btn-p" onclick="guardarAv()">Guardar avance</button></div>
+</div></div>
+
+<!-- Modal Nuevo usuario -->
+<div class="mb" id="mu"><div class="md">
+  <div class="mh"><div class="mt">Nuevo usuario</div><button class="btn-sm" onclick="cM('mu')">✕</button></div>
+  <div class="fr"><div class="fg"><label>Nombre completo</label><input type="text" id="un0" placeholder="Nombre"></div><div class="fg"><label>Correo</label><input type="text" id="un1" placeholder="nombre@eticom.mx"></div></div>
+  <div class="fr"><div class="fg"><label>Perfil</label><select id="un2"><option value="vendedor">Vendedor</option><option value="calidad">Calidad (Admin)</option></select></div><div class="fg"><label>Contraseña inicial</label><input type="text" id="un3" placeholder="Contraseña"></div></div>
+  <div class="mf"><button class="btn" onclick="cM('mu')">Cancelar</button><button class="btn btn-p" onclick="crearU()">Crear usuario</button></div>
+</div></div>
+
+<!-- Modal Catálogo tipo producto -->
+<div class="mb" id="mcat-tp"><div class="md" style="width:400px">
+  <div class="mh"><div class="mt">Agregar tipo de producto</div><button class="btn-sm" onclick="cM('mcat-tp')">✕</button></div>
+  <div class="fg"><label>Nombre del tipo</label><input type="text" id="cat-tp-inp" placeholder="Ej: Etiqueta, Empaque Flexible, Caja Plegadiza..."></div>
+  <div class="mf"><button class="btn" onclick="cM('mcat-tp')">Cancelar</button><button class="btn btn-p" onclick="addCat('tp')">Agregar</button></div>
+</div></div>
+
+<!-- Modal Catálogo mesa control -->
+<div class="mb" id="mcat-mc"><div class="md" style="width:400px">
+  <div class="mh"><div class="mt">Agregar persona a Mesa de control</div><button class="btn-sm" onclick="cM('mcat-mc')">✕</button></div>
+  <div class="fg"><label>Nombre completo</label><input type="text" id="cat-mc-inp" placeholder="Ej: Stefany Ramírez"></div>
+  <div class="mf"><button class="btn" onclick="cM('mcat-mc')">Cancelar</button><button class="btn btn-p" onclick="addCat('mc')">Agregar</button></div>
+</div></div>
+
+<!-- Modal PRO-SGC-04-C -->
+<div class="mb" id="m04c"><div class="md" style="width:580px">
+  <div class="mh"><div><div class="mt">PRO-SGC-04-C — <span id="d04c-pn" style="font-size:13px;color:var(--text2)"></span></div><div class="ms">Revisión de Rechazos Externos · Tamaño carta</div></div><button class="btn-sm" onclick="cM('m04c')">✕</button></div>
+  <div class="sec-t">Datos automáticos del caso</div>
+  <div class="fr" style="margin-bottom:4px"><div><div class="rl">Cliente <span class="at-tag">Auto</span></div><div class="rf" id="d04c-cli"></div></div><div><div class="rl">No. queja <span class="at-tag">Auto</span></div><div class="rf" id="d04c-q"></div></div></div>
+  <div class="fr" style="margin-bottom:4px"><div><div class="rl">Nombre etiqueta <span class="at-tag">Auto</span></div><div class="rf" id="d04c-et"></div></div><div><div class="rl">Pedido (lote) <span class="at-tag">Auto</span></div><div class="rf" id="d04c-lo"></div></div></div>
+  <div class="fr" style="margin-bottom:4px"><div><div class="rl">Gerente proyecto <span class="at-tag">Auto</span></div><div class="rf" id="d04c-gp"></div></div><div><div class="rl">Cantidad reportada <span class="at-tag">Auto</span></div><div class="rf" id="d04c-cr"></div></div></div>
+  <div class="fr" style="margin-bottom:4px"><div><div class="rl">Factura/Remisión <span class="at-tag">Auto</span></div><div class="rf" id="d04c-fa"></div></div><div><div class="rl">Fecha <span class="at-tag">Auto</span></div><div class="rf" id="d04c-fe"></div></div></div>
+  <div style="margin-bottom:12px"><div class="rl">Descripción del rechazo <span class="at-tag">Auto</span></div><div class="rf" id="d04c-de"></div></div>
+  <div class="sec-t">Completa en revisión</div>
+  <div class="fr"><div class="fg"><label>Cantidad recibida</label><input type="text" id="d04c-cre" placeholder="Piezas recibidas"></div><div class="fg"><label>Cantidad final</label><input type="text" id="d04c-cfi" placeholder="Después de revisión"></div></div>
+  <div class="fg"><label>Conclusión del proceso de revisión</label><textarea id="d04c-co" rows="2" placeholder="Conclusión del equipo revisor..."></textarea></div>
+  <div class="fr"><div class="fg"><label>Se requiere</label><input type="text" id="d04c-sr" placeholder="Ej: Reimpresión..."></div><div class="fg"><label>Se emite</label><input type="text" id="d04c-se" placeholder="Ej: N.C. No. 001"></div></div>
+  <div class="fr3"><div class="fg"><label>N.C. (millares)</label><input type="number" id="d04c-nc" placeholder="0" oninput="calcNC()"></div><div class="fg"><label>Costo x millar ($)</label><input type="number" id="d04c-cm" placeholder="0.00" oninput="calcNC()"></div><div class="fg"><label>Precio x millar ($)</label><input type="number" id="d04c-pm" placeholder="0.00"></div></div>
+  <div style="font-size:13px;color:var(--text2);margin-bottom:4px">Costo total de rechazo: <strong id="d04c-ct" style="color:var(--text)">$0.00</strong></div>
+  <div class="mf"><button class="btn" onclick="cM('m04c')">Cancelar</button><div style="display:flex;gap:8px"><button class="btn btn-p" onclick="prev04c()">👁 Vista previa</button><button class="btn btn-s" onclick="print04c()">🖨 Imprimir / PDF</button></div></div>
+</div></div>
+
+<!-- Modal PRO-SGC-04-E -->
+<div class="mb" id="m04e"><div class="md" style="width:560px">
+  <div class="mh"><div><div class="mt">PRO-SGC-04-E — <span id="d04e-pn" style="font-size:13px;color:var(--text2)"></span></div><div class="ms">Autorización Reproceso/Retrabajo · Tamaño carta</div></div><button class="btn-sm" onclick="cM('m04e')">✕</button></div>
+  <div class="sec-t">Datos automáticos del caso</div>
+  <div class="fr" style="margin-bottom:4px"><div><div class="rl">Cliente <span class="at-tag">Auto</span></div><div class="rf" id="d04e-cli"></div></div><div><div class="rl">Nombre etiqueta <span class="at-tag">Auto</span></div><div class="rf" id="d04e-et"></div></div></div>
+  <div class="fr" style="margin-bottom:4px"><div><div class="rl">Pedido (lote) <span class="at-tag">Auto</span></div><div class="rf" id="d04e-lo"></div></div><div><div class="rl">Cantidad <span class="at-tag">Auto</span></div><div class="rf" id="d04e-ca"></div></div></div>
+  <div class="fr" style="margin-bottom:12px"><div><div class="rl">Fecha <span class="at-tag">Auto</span></div><div class="rf" id="d04e-fe"></div></div><div><div class="rl">Tipo</div><div style="display:flex;gap:20px;margin-top:8px"><label class="ri"><input type="radio" name="eti" value="Interno"> Interno</label><label class="ri"><input type="radio" name="eti" value="Externo" checked> Externo</label></div></div></div>
+  <div class="sec-t">Completa para el reproceso</div>
+  <div class="fg"><label>Descripción general del reproceso/retrabajo</label><textarea id="d04e-de" rows="4" placeholder="Describe detalladamente las instrucciones del reproceso..."></textarea></div>
+  <div class="fg"><label>Notas adicionales</label><textarea id="d04e-no" rows="3" placeholder="Observaciones, instrucciones especiales, restricciones..."></textarea></div>
+  <div class="mf"><button class="btn" onclick="cM('m04e')">Cancelar</button><div style="display:flex;gap:8px"><button class="btn btn-p" onclick="prev04e()">👁 Vista previa</button><button class="btn btn-s" onclick="print04e()">🖨 Imprimir / PDF</button></div></div>
+</div></div>
+
+<!-- LIGHTBOX -->
+<div class="lb" id="lbx" onclick="lbBg(event)">
+  <button class="lbcl" onclick="closeLB()">✕</button>
+  <div id="lbc2"></div>
+  <div class="lbtb"><button class="lbnv" id="lbpv" onclick="lbNav(-1)">‹</button><span class="lbco" id="lbco"></span><button class="lbnv" id="lbnx" onclick="lbNav(1)">›</button></div>
+  <div class="lbnm" id="lbnm"></div>
+</div>
+
+<!-- PRINT PREVIEW -->
+<div class="prbg" id="prbg">
+  <div class="prm">
+    <div class="prt"><span id="prtb">Vista previa</span>
+      <div style="display:flex;gap:10px"><button class="btn btn-s" onclick="doPrint()" style="font-size:12px">🖨 Imprimir / Guardar PDF</button><button class="btn" onclick="closePR()" style="font-size:12px">✕ Cerrar</button></div>
+    </div>
+    <div style="padding:14px;background:#fff"><div id="prc"></div></div>
+  </div>
+</div>
+
+<script>
+// ===== INIT =====
+window.addEventListener('DOMContentLoaded', async ()=>{
+  ['ll','vl','cl'].forEach(id=>{const el=document.getElementById(id);if(el)el.src=L64;});
+  // Verificar sesión existente
+  const { data: { session } } = await sb.auth.getSession();
+  if(session) await loginConSesion(session.user);
+});
+
+const TODAY=new Date().toISOString().split('T')[0];
+let CU=null,CC=null,PC=0,TS='',EF=[];
+let LBF=[],LBI=0;
+
+// ===== CATÁLOGOS (desde Supabase) =====
+let cats={ tipoProd:[], mesaControl:[] };
+
+async function cargarCats(){
+  const { data } = await sb.from('catalogos').select('*').order('orden');
+  if(data){
+    cats.tipoProd = data.filter(x=>x.tipo==='tipoProd').map(x=>x.valor);
+    cats.mesaControl = data.filter(x=>x.tipo==='mesaControl').map(x=>x.valor);
+  }
+}
+
+// ===== RECHAZOS (desde Supabase) =====
+let rechazos=[];
+
+async function cargarRechazos(){
+  const { data, error } = await sb.from('rechazos')
+    .select(`*, productos(*), evidencias(*), timeline(*)`)
+    .order('created_at', { ascending: false });
+  if(error){ console.error('Error cargando rechazos:', error); return; }
+  // Normalizar estructura para compatibilidad con el sistema
+  rechazos = (data||[]).map(r=>({
+    ...r,
+    folio: r.folio,
+    cliente: r.cliente,
+    vendedor: r.vendedor_nombre,
+    email: r.vendedor_email,
+    mesa: r.mesa_control,
+    tipoProd: r.tipo_prod,
+    tipo: r.tipo_nc,
+    fecha: r.fecha,
+    estado: r.estado,
+    causa: r.causa,
+    accion: r.accion,
+    comentario: r.comentario_calidad,
+    productos: (r.productos||[]).sort((a,b)=>a.num-b.num).map(p=>({
+      ...p, tipoProd: p.tipo_prod, nombre: p.nombre, desc: p.descripcion
+    })),
+    evidencias: (r.evidencias||[]).map(e=>({
+      name: e.nombre, icon: e.icono, isImg: e.es_imagen, url: e.storage_url
+    })),
+    timeline: (r.timeline||[]).sort((a,b)=>new Date(a.fecha_registro)-new Date(b.fecha_registro)).map(t=>({
+      t: t.texto + (t.mensaje_calidad ? '\n💬 "'+t.mensaje_calidad+'"' : ''),
+      f: new Date(t.fecha_registro).toLocaleString('es-MX'),
+      c: t.color
+    }))
+  }));
+}
+
+// ===== DATA =====
+let usuarios=[];
+async function cargarUsuarios(){
+  const { data } = await sb.from('usuarios').select('*').order('nombre');
+  if(data) usuarios=data.map(u=>({...u, pass:'***', perfil:u.perfil}));
+}
+
+let rechazos=[
+  {folio:'RCH-00892',cliente:'Ma. Lourdes Mendoza',vendedor:'Rodrigo Mejia',email:'vendedor@eticom.mx',mesa:'Stefany Ramírez',
+   tipoProd:'Etiqueta',
+   productos:[
+     {num:1,tipoProd:'Etiqueta',nombre:'M15572 ETIQ 946ML F. PETRONAS SYNTIUM 500 SAE 20W50 / 5K',lote:'145731-01',partida:'1',factura:'152923',cantidad:'3K',codigo:'300326 14',desc:'Se invirtieron los colores y las cantidades no coinciden con la especificación.'},
+     {num:2,tipoProd:'Etiqueta',nombre:'M15573 ETIQ 946ML R. PETRONAS SYNTIUM 500 SAE 20W50 / 5K',lote:'145731-02',partida:'2',factura:'153264',cantidad:'3K',codigo:'300326 15',desc:'Mismo defecto que partida 1 — inversión de colores CYMK.'},
+     {num:3,tipoProd:'Etiqueta',nombre:'ETIQ 19L PETRONAS URANIA 3000 SAE 15W40 API / 1K',lote:'145886-03',partida:'3',factura:'153264',cantidad:'1K',codigo:'M157602',desc:'Texto ilegible en zona de datos técnicos.'},
+   ],
+   tipo:'RECHAZO',fecha:'20/04/2026',estado:'En proceso',causa:'Calibración de equipo',accion:'Reimpresión autorizada',
+   comentario:'Se detectó desviación en valores CYMK en prensa #2. Reimpresión programada para mañana.',
+   evidencias:[{name:'foto_rechazo_frontal.jpg',icon:'🖼',isImg:false,url:null},{name:'video_defecto_color.mp4',icon:'🎥',isImg:false,url:null},{name:'muestra_etiqueta.png',icon:'🖼',isImg:false,url:null}],
+   timeline:[{t:'Rechazo registrado por Rodrigo Mejia',f:'20/04/2026 · 10:05',c:'#7C3AED'},{t:'Calidad actualizó: En proceso · Reimpresión autorizada',f:'21/04/2026 · 09:30',c:'#D97706'}]},
+
+  {folio:'RCH-00891',cliente:'Distribuidora Norte S.A.',vendedor:'Rodrigo Mejia',email:'vendedor@eticom.mx',mesa:'Carlos Torres',
+   tipoProd:'Empaque Flexible',
+   productos:[{num:1,tipoProd:'Empaque Flexible',nombre:'BOLSA ACEITE MINERAL 1L',lote:'145600-01',partida:'1',factura:'152800',cantidad:'2K',codigo:'DN-EF-001',desc:'Color fuera de especificación en pantone de marca.'}],
+   tipo:'RECHAZO',fecha:'18/04/2026',estado:'Abierto',causa:'—',accion:'—',comentario:'',
+   evidencias:[{name:'muestra_bolsa.png',icon:'🖼',isImg:false,url:null}],
+   timeline:[{t:'Rechazo registrado por Rodrigo Mejia',f:'18/04/2026 · 14:20',c:'#7C3AED'}]},
+
+  {folio:'RCH-00890',cliente:'Lácteos del Sur',vendedor:'Ana Torres',email:'ana@eticom.mx',mesa:'María López',
+   tipoProd:'Caja Plegadiza',
+   productos:[{num:1,tipoProd:'Caja Plegadiza',nombre:'CAJA LECHE ENTERA 1L PREMIUM',lote:'145500-01',partida:'1',factura:'152700',cantidad:'5K',codigo:'LS-CJ-001',desc:'Adhesivo defectuoso — cajas no arman correctamente.'}],
+   tipo:'RECHAZO',fecha:'15/04/2026',estado:'Cerrado',causa:'Falla de material',accion:'Nota de crédito emitida',
+   comentario:'Caso resuelto. Nota de crédito No. 0234 emitida y aceptada por cliente.',
+   evidencias:[],
+   timeline:[{t:'Rechazo registrado por Ana Torres',f:'15/04/2026 · 11:00',c:'#7C3AED'},{t:'Calidad investigó: Falla de material identificada',f:'16/04/2026',c:'#D97706'},{t:'Nota de crédito emitida · Caso cerrado',f:'17/04/2026',c:'#16A34A'}]},
+];
+
+// ===== AUTH (Supabase) =====
+async function doLogin(){
+  const email=document.getElementById('lu').value.trim();
+  const pass=document.getElementById('lp').value.trim();
+  document.getElementById('le').textContent='Iniciando sesión...';
+  document.getElementById('le').style.display='block';
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+  if(error){
+    document.getElementById('le').textContent='Usuario o contraseña incorrectos';
+    return;
+  }
+  document.getElementById('le').style.display='none';
+  await loginConSesion(data.user);
+}
+async function qL(pf){
+  // Acceso rápido demo — solo funciona con usuarios de prueba configurados
+  const demos = {
+    vendedor: {email:'vendedor@eticom.mx', password:'1234eticom'},
+    calidad:  {email:'calidad@eticom.mx',  password:'1234eticom'}
+  };
+  const creds = demos[pf];
+  document.getElementById('lu').value = creds.email;
+  document.getElementById('lp').value = creds.password;
+  doLogin();
+}
+async function loginConSesion(authUser){
+  await cargarCats();
+  await cargarRechazos();
+  await cargarUsuarios();
+  // Buscar perfil en tabla usuarios
+  const { data: perfil } = await sb.from('usuarios')
+    .select('*').eq('email', authUser.email).single();
+  if(!perfil){ alert('Usuario no configurado en el sistema.'); return; }
+  CU = { ...perfil, pass: '***' };
+  document.getElementById('sc-login').classList.remove('active');
+  if(CU.perfil==='vendedor'){
+    document.getElementById('sc-v').classList.add('active');
+    document.getElementById('vun').textContent=CU.nombre;
+    renderVD();
+  } else {
+    document.getElementById('sc-c').classList.add('active');
+    document.getElementById('cun').textContent=CU.nombre;
+    renderCD();renderCR();renderU();
+  }
+}
+async function logout(){
+  await sb.auth.signOut();
+  CU=null;rechazos=[];usuarios=[];
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('sc-login').classList.add('active');
+  document.getElementById('lu').value='';document.getElementById('lp').value='';
+}
+
+// ===== NAV =====
+function vNav(p,el){document.querySelectorAll('#sc-v .page').forEach(x=>x.classList.remove('active'));document.querySelectorAll('#sc-v .nav-it').forEach(x=>x.classList.remove('active'));document.getElementById('vp-'+p).classList.add('active');if(el)el.classList.add('active');}
+function cNav(p,el){document.querySelectorAll('#sc-c .page').forEach(x=>x.classList.remove('active'));document.querySelectorAll('#sc-c .nav-it').forEach(x=>x.classList.remove('active'));document.getElementById('cp-'+p).classList.add('active');if(el)el.classList.add('active');}
+
+// ===== HELPERS =====
+function bH(e){
+  if(e==='Abierto')return'<span class="badge b-ab">Abierto</span>';
+  if(e==='En proceso')return'<span class="badge b-pr">En proceso</span>';
+  if(e==='Cerrado')return'<span class="badge b-cl">Cerrado</span>';
+  return'<span class="badge b-nu">Recién enviado</span>';
+}
+function evC(ev){return ev.length?`<span style="font-size:11px;color:var(--text2);font-weight:500">${ev.length} archivo${ev.length!==1?'s':''}</span>`:'<span style="font-size:11px;color:var(--text3)">Sin evidencias</span>';}
+function ftI(name){const e=name.split('.').pop().toLowerCase();if(['jpg','jpeg','png','gif','webp','heic','bmp','svg'].includes(e))return{cls:'ep-i',lbl:'IMG',icon:'🖼',isImg:true};if(['mp4','mov','avi','mkv','wmv','m4v'].includes(e))return{cls:'ep-v',lbl:'VID',icon:'🎥',isImg:false};if(['mp3','m4a','wav','ogg','aac'].includes(e))return{cls:'ep-a',lbl:'AUD',icon:'🎵',isImg:false};if(['pdf','doc','docx','xls','xlsx','ppt','pptx'].includes(e))return{cls:'ep-d',lbl:e.toUpperCase(),icon:'📄',isImg:false};return{cls:'ep-o',lbl:e.toUpperCase()||'?',icon:'📁',isImg:false};}
+function fmtSz(b){if(b<1024)return b+'B';if(b<1048576)return Math.round(b/1024)+'KB';return(b/1048576).toFixed(1)+'MB';}
+function gv(id){return(document.getElementById(id)||{}).value||'';}
+function gt(id){return(document.getElementById(id)||{}).textContent||'';}
+
+// ===== EVIDENCIAS GRID =====
+function egH(evs){
+  if(!evs||!evs.length)return'';
+  return`<div class="eg">${evs.map((ev,i)=>{
+    const info=ftI(ev.name);
+    const thumb=ev.url?`<img src="${ev.url}" alt="${ev.name}">`:`<div class="etp"><div style="font-size:26px">${ev.icon}</div><div style="font-size:10px;color:var(--text3);font-weight:600">${info.lbl}</div></div>`;
+    return`<div class="et" onclick="openLBCase(${JSON.stringify(evs).replace(/"/g,"'")},${i})"><span class="epill ${info.cls}">${info.lbl}</span>${thumb}<div class="etn">${ev.name}</div></div>`;
+  }).join('')}</div>`;
+}
+
+// ===== VENDEDOR =====
+function renderVD(){
+  if(!CU||CU.perfil!=='vendedor')return;
+  const mis=rechazos.filter(r=>r.email===CU.email);
+  document.getElementById('vs0').textContent=mis.length;
+  document.getElementById('vs1').textContent=mis.filter(r=>r.estado==='Abierto').length;
+  document.getElementById('vs2').textContent=mis.filter(r=>r.estado==='En proceso').length;
+  document.getElementById('vs3').textContent=mis.filter(r=>r.estado==='Cerrado').length;
+  document.getElementById('vnd').innerHTML=mis.some(r=>r.comentario)?'<span class="nd"></span>':'';
+  document.getElementById('vdt').innerHTML=mis.map(r=>`
+    <tr class="cr" onclick="vVerC('${r.folio}')">
+      <td style="font-family:monospace;font-size:11px;font-weight:600">${r.folio}</td>
+      <td style="font-weight:500">${r.cliente}</td>
+      <td><span class="badge b-tp">${r.tipoProd||'—'}</span></td>
+      <td>${evC(r.evidencias)}</td>
+      <td>${r.fecha}</td>
+      <td>${bH(r.estado)}</td>
+      <td>${r.comentario?`<span class="notif-pill">● Calidad actualizó</span>`:`<span style="font-size:11px;color:var(--text3)">Sin movimientos</span>`}</td>
+    </tr>`).join('');
+}
+
+function renderVM(){
+  if(!CU||CU.perfil!=='vendedor')return;
+  const mis=rechazos.filter(r=>r.email===CU.email);
+  document.getElementById('vmt').innerHTML=mis.map(r=>`
+    <tr class="cr" onclick="vVerC('${r.folio}')">
+      <td style="font-family:monospace;font-size:11px;font-weight:600">${r.folio}</td>
+      <td style="font-weight:500">${r.cliente}</td>
+      <td><span class="badge b-tp">${r.tipoProd||'—'}</span></td>
+      <td>${evC(r.evidencias)}</td>
+      <td>${r.tipo}</td>
+      <td>${r.fecha}</td>
+      <td>${bH(r.estado)}</td>
+      <td>${r.comentario?`<span style="font-size:11px;color:var(--blue);font-weight:500">↑ Calidad actualizó</span>`:`<span style="font-size:11px;color:var(--text3)">Sin movimientos</span>`}</td>
+    </tr>`).join('');
+}
+
+function vVerC(folio){
+  const r=rechazos.find(x=>x.folio===folio);if(!r)return;
+  document.getElementById('vcf').textContent=folio;
+  const tlH=r.timeline.map(t=>{
+    const lines=t.t.split('\n');
+    const main=lines[0];
+    const msg=lines.slice(1).join(' ');
+    return`<div class="tl"><div class="td" style="background:${t.c}"></div><div>
+      <div class="tt" style="font-weight:500">${main}</div>
+      ${msg?`<div style="font-size:12px;color:var(--blue-text);background:var(--blue-bg);border:1px solid var(--blue-border);border-radius:6px;padding:5px 9px;margin-top:4px;line-height:1.5">${msg}</div>`:''}
+      <div class="tf">${t.f}</div>
+    </div></div>`;
+  }).join('');
+  const evH=egH(r.evidencias);
+  document.getElementById('vcb').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+      <div class="card"><div class="ct">Datos del caso</div>
+        <div class="dr"><span class="dl">Cliente</span><span style="font-weight:500">${r.cliente}</span></div>
+        <div class="dr"><span class="dl">Tipo producto</span><span><span class="badge b-tp">${r.tipoProd||'—'}</span></span></div>
+        <div class="dr"><span class="dl">Tipo NC</span><span>${r.tipo}</span></div>
+        <div class="dr"><span class="dl">Productos</span><span>${r.productos.length}</span></div>
+        <div class="dr"><span class="dl">Mesa de control</span><span>${r.mesa||'—'}</span></div>
+        <div class="dr"><span class="dl">Fecha</span><span>${r.fecha}</span></div>
+        <div class="dr"><span class="dl">Estado</span><span>${bH(r.estado)}</span></div>
+      </div>
+      <div class="card"><div class="ct">Respuesta de calidad</div>
+        <div class="dr"><span class="dl">Causa raíz</span><span>${r.causa}</span></div>
+        <div class="dr"><span class="dl">Acción tomada</span><span>${r.accion}</span></div>
+        ${r.comentario?`<div style="margin-top:12px;padding:12px;background:var(--blue-bg);border:1px solid var(--blue-border);border-radius:8px;font-size:12px;color:var(--blue-text)">💬 <strong>Mensaje de Calidad:</strong><br>${r.comentario}</div>`:'<div style="font-size:12px;color:var(--text3);margin-top:10px;padding:12px;background:var(--bg);border-radius:8px">Sin comentarios aún — Calidad está revisando tu caso.</div>'}
+      </div>
+    </div>
+    ${evH?`<div class="card"><div class="ct">Evidencias adjuntas (${r.evidencias.length} archivos) <span style="font-size:11px;color:var(--text3);font-weight:400">— clic para ver en pantalla completa</span></div>${evH}</div>`:''}
+    <div class="card"><div class="ct">Línea de tiempo</div>${tlH}</div>`;
+  vNav('c',null);document.getElementById('vn2').classList.add('active');
+}
+
+// ===== NUEVO RECHAZO =====
+function poblarMesa(){
+  const sel=document.getElementById('nv1');
+  sel.innerHTML='<option value="">— Seleccionar persona —</option>'+cats.mesaControl.map(p=>`<option value="${p}">${p}</option>`).join('');
+}
+function initN(){
+  PC=0;TS='';
+  EF.forEach(f=>{if(f.url)URL.revokeObjectURL(f.url);});EF=[];
+  document.getElementById('pc').innerHTML='';
+  document.getElementById('nv3').value='';
+  document.getElementById('nv2').value=TODAY;
+  document.getElementById('nv0').value=CU?.nombre||'';
+  poblarMesa();
+  document.getElementById('nv1').value='';
+  document.querySelectorAll('#tg .chi,#rg .chi').forEach(el=>el.classList.remove('ck'));
+  renderEG();addP();
+}
+function addP(){
+  PC++;
+  const num=document.querySelectorAll('#pc .pb').length+1;
+  const div=document.createElement('div');div.className='pb';
+  const tpOpts=cats.tipoProd.map(t=>`<option value="${t}">${t}</option>`).join('');
+  div.innerHTML=`
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <span style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.04em">Producto ${num}</span>
+      ${num>1?`<button class="btn btn-d" style="font-size:11px;padding:3px 10px" onclick="this.closest('.pb').remove();renumP()">✕ Eliminar</button>`:''}
+    </div>
+    <div class="fr" style="margin-bottom:0">
+      <div class="fg"><label>Tipo de producto</label><select><option value="">— Seleccionar —</option>${tpOpts}</select></div>
+      <div class="fg"><label>Nombre del producto</label><input type="text" placeholder="Nombre completo del producto"></div>
+    </div>
+    <div class="fr" style="margin-bottom:0">
+      <div class="fg"><label>Lote</label><input type="text" placeholder="Ej: 145694"></div>
+      <div class="fg"><label>Partida</label><input type="text" placeholder="Ej: 2"></div>
+    </div>
+    <div class="fr" style="margin-bottom:0">
+      <div class="fg"><label>Factura / Remisión</label><input type="text" placeholder="Ej: 152923"></div>
+      <div class="fg"><label>Cantidad reclamada</label><input type="text" placeholder="Ej: 3K"></div>
+    </div>
+    <div class="fr" style="margin-bottom:0">
+      <div class="fg"><label>Código del producto</label><input type="text" placeholder="Ej: 300326 14"></div>
+      <div></div>
+    </div>
+    <div class="fg"><label>Descripción del rechazo</label><textarea placeholder="Describe detalladamente el problema detectado en este producto..." rows="2"></textarea></div>`;
+  document.getElementById('pc').appendChild(div);
+}
+function renumP(){document.querySelectorAll('#pc .pb').forEach((el,i)=>el.querySelector('span').textContent='Producto '+(i+1));}
+function selT(el,val){document.querySelectorAll('#tg .chi').forEach(e=>e.classList.remove('ck'));el.classList.add('ck');TS=val;}
+function hFiles(fl){Array.from(fl).forEach(f=>{if(!EF.find(x=>x.file.name===f.name)){const info=ftI(f.name);EF.push({file:f,info,url:info.isImg?URL.createObjectURL(f):null});}});renderEG();}
+function hDrop(e){e.preventDefault();document.getElementById('dz').classList.remove('ov');hFiles(e.dataTransfer.files);}
+function rmEF(i){if(EF[i].url)URL.revokeObjectURL(EF[i].url);EF.splice(i,1);renderEG();}
+function renderEG(){
+  const badge=document.getElementById('evc');badge.style.display=EF.length?'inline-flex':'none';badge.textContent=EF.length;
+  document.getElementById('eg').innerHTML=EF.map((f,i)=>{
+    const{info,url}=f;
+    const thumb=url?`<img src="${url}" alt="${f.file.name}">`:`<div class="etp"><div style="font-size:26px">${info.icon}</div><div style="font-size:10px;color:var(--text3);font-weight:600">${info.lbl}</div><div style="font-size:9px;color:var(--text3)">${fmtSz(f.file.size)}</div></div>`;
+    return`<div class="et" onclick="openLBUpload(${i})"><span class="epill ${info.cls}">${info.lbl}</span>${thumb}<div class="etn">${f.file.name}</div><button class="etd" onclick="event.stopPropagation();rmEF(${i})">✕</button></div>`;
+  }).join('');
+}
+async function guardar(){
+  const cliente=document.getElementById('nv3').value||'Cliente';
+  const mesa=document.getElementById('nv1').value||'—';
+  const prods=Array.from(document.querySelectorAll('#pc .pb')).map((el,i)=>{
+    const sels=el.querySelectorAll('select');
+    const ins=el.querySelectorAll('input,textarea');
+    return{num:i+1,tipo_prod:sels[0]?.value||'—',nombre:ins[0]?.value||'—',lote:ins[1]?.value||'—',partida:ins[2]?.value||'—',factura:ins[3]?.value||'—',cantidad:ins[4]?.value||'—',codigo:ins[5]?.value||'—',descripcion:ins[6]?.value||'—'};
+  });
+  const tipoProdPrinc=prods[0]?.tipo_prod||'—';
+  // Generar folio
+  const { data: folioData } = await sb.rpc('generar_folio');
+  const folio = folioData || ('RCH-'+String(Math.floor(Math.random()*90000)+10000));
+  const fecha = new Date().toLocaleDateString('es-MX');
+  // Insertar rechazo
+  const { data: rechazoNew, error: errR } = await sb.from('rechazos').insert({
+    folio, cliente,
+    vendedor_nombre: CU.nombre, vendedor_email: CU.email,
+    mesa_control: mesa, tipo_prod: tipoProdPrinc,
+    tipo_nc: TS||'RECHAZO', fecha,
+    estado:'Abierto', causa:'—', accion:'—', comentario_calidad:''
+  }).select().single();
+  if(errR){ alert('Error al guardar: '+errR.message); return; }
+  // Insertar productos
+  const prodsInsert = prods.map(p=>({...p, rechazo_id: rechazoNew.id}));
+  await sb.from('productos').insert(prodsInsert);
+  // Subir evidencias a Storage y registrar en BD
+  for(const f of EF){
+    const path = `${rechazoNew.id}/${Date.now()}_${f.file.name}`;
+    const { error: errS } = await sb.storage.from('evidencias').upload(path, f.file);
+    let url = null;
+    if(!errS){
+      const { data: urlData } = sb.storage.from('evidencias').getPublicUrl(path);
+      url = urlData?.publicUrl || null;
+    }
+    await sb.from('evidencias').insert({
+      rechazo_id: rechazoNew.id, nombre: f.file.name,
+      icono: f.info.icon, es_imagen: f.info.isImg,
+      storage_path: path, storage_url: url
+    });
+  }
+  // Insertar entrada de timeline
+  await sb.from('timeline').insert({
+    rechazo_id: rechazoNew.id,
+    texto: `Rechazo registrado por ${CU.nombre}`,
+    mensaje_calidad: '', color: '#7C3AED'
+  });
+  // Recargar datos
+  await cargarRechazos();
+  EF=[];renderVD();renderCD();renderCR();
+  alert(`✓ Rechazo ${folio} enviado exitosamente a Calidad.`);
+  initN();vNav('d',document.getElementById('vn0'));
+}
+
+// ===== CALIDAD =====
+function renderCD(){
+  document.getElementById('cs0').textContent=rechazos.length;
+  document.getElementById('cs1').textContent=rechazos.filter(r=>r.estado==='Abierto').length;
+  document.getElementById('cs2').textContent=rechazos.filter(r=>r.estado==='En proceso').length;
+  document.getElementById('cs3').textContent=rechazos.filter(r=>r.estado==='Cerrado').length;
+  document.getElementById('cdt').innerHTML=rechazos.map(r=>`
+    <tr class="cr" onclick="cVerC('${r.folio}')">
+      <td style="font-family:monospace;font-size:11px;font-weight:600">${r.folio}</td>
+      <td style="font-weight:500">${r.cliente}</td>
+      <td>${r.vendedor}</td>
+      <td><span class="badge b-tp">${r.tipoProd||'—'}</span></td>
+      <td>${evC(r.evidencias)}</td>
+      <td>${r.fecha}</td>
+      <td>${bH(r.estado)}</td>
+      <td><button class="btn-sm" onclick="event.stopPropagation();oAv('${r.folio}')">Actualizar</button></td>
+    </tr>`).join('');
+}
+function renderCR(){
+  document.getElementById('crt').innerHTML=rechazos.map(r=>`
+    <tr class="cr" onclick="cVerC('${r.folio}')">
+      <td style="font-family:monospace;font-size:11px;font-weight:600">${r.folio}</td>
+      <td style="font-weight:500">${r.cliente}</td>
+      <td>${r.vendedor}</td>
+      <td><span class="badge b-tp">${r.tipoProd||'—'}</span></td>
+      <td>${evC(r.evidencias)}</td>
+      <td>${r.tipo}</td>
+      <td>${r.fecha}</td>
+      <td>${bH(r.estado)}</td>
+      <td><button class="btn-sm" onclick="event.stopPropagation();oAv('${r.folio}')">Actualizar</button></td>
+    </tr>`).join('');
+}
+function cVerC(folio){
+  const r=rechazos.find(x=>x.folio===folio);if(!r)return;
+  CC=folio;document.getElementById('ccf').textContent=folio;
+  const tlH=r.timeline.map(t=>{
+    const lines=t.t.split('\n');
+    const main=lines[0];
+    const msg=lines.slice(1).join(' ');
+    return`<div class="tl"><div class="td" style="background:${t.c}"></div><div>
+      <div class="tt" style="font-weight:500">${main}</div>
+      ${msg?`<div style="font-size:12px;color:var(--blue-text);background:var(--blue-bg);border:1px solid var(--blue-border);border-radius:6px;padding:5px 9px;margin-top:4px;line-height:1.5">${msg}</div>`:''}
+      <div class="tf">${t.f}</div>
+    </div></div>`;
+  }).join('');
+  const evH=egH(r.evidencias);
+  const prodsH=r.productos.map((p,i)=>`
+    <div class="pb">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:12px;font-weight:700;color:var(--text2)">Producto ${p.num}</span>
+          <span class="badge b-tp">${p.tipoProd||r.tipoProd||'—'}</span>
+        </div>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-p" style="font-size:11px;padding:4px 12px" onclick="o04c('${folio}',${i})">📋 PRO-SGC-04-C</button>
+          <button class="btn btn-w" style="font-size:11px;padding:4px 12px" onclick="o04e('${folio}',${i})">🔄 PRO-SGC-04-E</button>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px">
+        <div><div style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase">Lote</div><div style="font-size:13px;font-weight:600">${p.lote}</div></div>
+        <div><div style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase">Cantidad</div><div style="font-size:13px;font-weight:600">${p.cantidad}</div></div>
+        <div><div style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase">Factura</div><div style="font-size:13px;font-weight:600">${p.factura}</div></div>
+      </div>
+      <div style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;margin-bottom:2px">Nombre del producto</div>
+      <div style="font-size:12px;font-weight:600;margin-bottom:6px">${p.nombre}</div>
+      <div style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;margin-bottom:2px">Descripción del rechazo</div>
+      <div style="font-size:12px;color:var(--text2)">${p.desc}</div>
+    </div>`).join('');
+  document.getElementById('ccb').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+      <div class="card"><div class="ct">Datos del caso</div>
+        <div class="dr"><span class="dl">Cliente</span><span style="font-weight:500">${r.cliente}</span></div>
+        <div class="dr"><span class="dl">Vendedor</span><span>${r.vendedor}</span></div>
+        <div class="dr"><span class="dl">Mesa de control</span><span>${r.mesa||'—'}</span></div>
+        <div class="dr"><span class="dl">Tipo producto</span><span><span class="badge b-tp">${r.tipoProd||'—'}</span></span></div>
+        <div class="dr"><span class="dl">Tipo NC</span><span>${r.tipo}</span></div>
+        <div class="dr"><span class="dl">Fecha</span><span>${r.fecha}</span></div>
+        <div class="dr"><span class="dl">Estado</span><span>${bH(r.estado)}</span></div>
+      </div>
+      <div class="card"><div class="ct">Análisis de calidad</div>
+        <div class="dr"><span class="dl">Causa raíz</span><span>${r.causa}</span></div>
+        <div class="dr"><span class="dl">Acción tomada</span><span>${r.accion}</span></div>
+        ${r.comentario?`<div style="margin-top:10px;font-size:12px;color:var(--text2)">Comentario enviado al vendedor:<br><span style="color:var(--text);font-style:italic">"${r.comentario}"</span></div>`:''}
+        <button class="btn btn-p" style="margin-top:14px;font-size:12px;width:100%" onclick="oAv('${folio}')">✏️ Registrar avance</button>
+      </div>
+    </div>
+    <div class="card"><div class="ct">Productos reportados (${r.productos.length}) — Generar documentos por producto</div>${prodsH}</div>
+    ${evH?`<div class="card"><div class="ct">Evidencias adjuntas (${r.evidencias.length}) — clic para ver en pantalla completa</div>${evH}</div>`:''}
+    <div class="card"><div class="ct">Línea de tiempo</div>${tlH}</div>`;
+  cNav('c',null);document.getElementById('cn1').classList.add('active');
+}
+
+// ===== AVANCE — FIX SINCRONIZACIÓN =====
+function oAv(folio){
+  CC=folio;
+  const r=rechazos.find(x=>x.folio===folio);
+  document.getElementById('avf-sub').textContent=`Folio: ${folio} · ${r?.cliente||''}`;
+  if(r)document.getElementById('ave').value=r.estado;
+  document.getElementById('avc').value='';
+  document.getElementById('ava').value='';
+  document.getElementById('avm').value='';
+  oM('mav');
+}
+async function guardarAv(){
+  const r=rechazos.find(x=>x.folio===CC);if(!r)return;
+  const estado=gv('ave');
+  const causa=gv('avc')||r.causa;
+  const accion=gv('ava')||r.accion;
+  const comentario=gv('avm');
+  const col=estado==='Cerrado'?'#16A34A':estado==='En proceso'?'#D97706':'#2563EB';
+  // Actualizar rechazo en Supabase
+  const { error: errU } = await sb.from('rechazos').update({
+    estado, causa, accion, comentario_calidad: comentario
+  }).eq('folio', CC);
+  if(errU){ alert('Error al guardar avance: '+errU.message); return; }
+  // Insertar en timeline
+  const tlTexto=`Calidad actualizó: ${estado} · ${accion}`;
+  await sb.from('timeline').insert({
+    rechazo_id: r.id,
+    texto: tlTexto,
+    mensaje_calidad: comentario,
+    color: col
+  });
+  cM('mav');
+  // Recargar y re-renderizar todo
+  await cargarRechazos();
+  renderCD();renderCR();renderVD();renderVM();
+  if(document.getElementById('cp-c').classList.contains('active'))cVerC(CC);
+  alert(`✓ Avance guardado.\n\nFolio: ${CC}\nEstado: ${estado}\nEl vendedor puede ver la actualización en su dashboard.`);
+}
+
+// ===== CATÁLOGOS =====
+function renderCat(){
+  document.getElementById('cat-tp-list').innerHTML=cats.tipoProd.length
+    ?cats.tipoProd.map(t=>`<div class="cat-item"><span>🏷 ${t}</span><button class="btn btn-d" style="font-size:11px;padding:2px 8px" onclick="delCat('tipoProd','${t}')">✕</button></div>`).join('')
+    :'<div style="font-size:12px;color:var(--text3);padding:10px 0">Sin elementos. Agrega el primero.</div>';
+  document.getElementById('cat-mc-list').innerHTML=cats.mesaControl.length
+    ?cats.mesaControl.map(m=>`<div class="cat-item"><span>👤 ${m}</span><button class="btn btn-d" style="font-size:11px;padding:2px 8px" onclick="delCat('mesaControl','${m}')">✕</button></div>`).join('')
+    :'<div style="font-size:12px;color:var(--text3);padding:10px 0">Sin personas. Agrega la primera.</div>';
+}
+async function addCat(tipo){
+  const id=tipo==='tp'?'cat-tp-inp':'cat-mc-inp';
+  const val=document.getElementById(id).value.trim();
+  if(!val){alert('Escribe un nombre para agregar');return;}
+  const tipoDb = tipo==='tp'?'tipoProd':'mesaControl';
+  const { error } = await sb.from('catalogos').insert({ tipo: tipoDb, valor: val });
+  if(error){ alert('Error: '+error.message); return; }
+  document.getElementById(id).value='';
+  cM('mcat-'+tipo);
+  await cargarCats();renderCat();
+}
+async function delCat(tipoDb, valor){
+  if(!confirm('¿Eliminar "'+valor+'" del catálogo?'))return;
+  await sb.from('catalogos').delete().eq('tipo', tipoDb).eq('valor', valor);
+  await cargarCats();renderCat();
+}
+
+// ===== USUARIOS =====
+function renderU(){
+  document.getElementById('ut').innerHTML=usuarios.map((u,i)=>`
+    <tr>
+      <td style="font-weight:600">${u.nombre}</td>
+      <td style="font-size:11px;color:var(--text3)">${u.email}</td>
+      <td><span class="rp ${u.perfil==='calidad'?'rp-c':'rp-v'}">${u.perfil==='calidad'?'Calidad · Admin':'Vendedor'}</span></td>
+      <td><span class="badge ${u.activo?'b-cl':'b-ab'}">${u.activo?'Activo':'Inactivo'}</span></td>
+      <td><button class="btn-sm" onclick="togU('${u.id}',${u.activo})">${u.activo?'Desactivar':'Activar'}</button></td>
+    </tr>`).join('');
+}
+async function crearU(){
+  const n=gv('un0'),e=gv('un1'),p=document.getElementById('un2').value,pw=gv('un3');
+  if(!n||!e||!pw){alert('Completa todos los campos');return;}
+  // Crear en Supabase Auth
+  const { error: errA } = await sb.auth.admin.createUser({ email:e, password:pw, email_confirm:true });
+  // Si no tienes service_role key, pide al usuario que se registre él mismo
+  // y luego tú lo agregas a la tabla usuarios manualmente
+  const { error: errU } = await sb.from('usuarios').insert({ nombre:n, email:e, perfil:p });
+  if(errU){ alert('Error: '+errU.message); return; }
+  cM('mu');
+  await cargarUsuarios();renderU();
+  ['un0','un1','un3'].forEach(id=>document.getElementById(id).value='');
+}
+async function togU(id, activo){
+  await sb.from('usuarios').update({ activo: !activo }).eq('id', id);
+  await cargarUsuarios();renderU();
+}
+
+// ===== DOCUMENTOS =====
+function o04c(folio,pi){
+  const r=rechazos.find(x=>x.folio===folio);if(!r)return;
+  const p=r.productos[pi];
+  document.getElementById('d04c-pn').textContent=`Producto ${p.num}`;
+  document.getElementById('d04c-cli').textContent=r.cliente;
+  document.getElementById('d04c-q').textContent=r.folio;
+  document.getElementById('d04c-et').textContent=p.nombre;
+  document.getElementById('d04c-lo').textContent=p.lote;
+  document.getElementById('d04c-gp').textContent=r.vendedor;
+  document.getElementById('d04c-cr').textContent=p.cantidad;
+  document.getElementById('d04c-fa').textContent=p.factura;
+  document.getElementById('d04c-fe').textContent=r.fecha;
+  document.getElementById('d04c-de').textContent=p.desc;
+  ['d04c-cre','d04c-cfi','d04c-co','d04c-sr','d04c-se','d04c-nc','d04c-cm','d04c-pm'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('d04c-ct').textContent='$0.00';
+  document.getElementById('m04c').dataset.folio=folio;
+  document.getElementById('m04c').dataset.pi=pi;
+  oM('m04c');
+}
+function o04e(folio,pi){
+  const r=rechazos.find(x=>x.folio===folio);if(!r)return;
+  const p=r.productos[pi];
+  document.getElementById('d04e-pn').textContent=`Producto ${p.num}`;
+  document.getElementById('d04e-cli').textContent=r.cliente;
+  document.getElementById('d04e-et').textContent=p.nombre;
+  document.getElementById('d04e-lo').textContent=p.lote;
+  document.getElementById('d04e-ca').textContent=p.cantidad;
+  document.getElementById('d04e-fe').textContent=r.fecha;
+  ['d04e-de','d04e-no'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('m04e').dataset.folio=folio;
+  document.getElementById('m04e').dataset.pi=pi;
+  oM('m04e');
+}
+function calcNC(){
+  const m=parseFloat(gv('d04c-nc'))||0,c=parseFloat(gv('d04c-cm'))||0;
+  document.getElementById('d04c-ct').textContent='$'+(m*c).toFixed(2);
+}
+
+function build04c(){
+  const m4=document.getElementById('m04c');
+  const r=rechazos.find(x=>x.folio===m4.dataset.folio);
+  const p=r.productos[parseInt(m4.dataset.pi)];
+  const ml=parseFloat(gv('d04c-nc'))||0,cm=parseFloat(gv('d04c-cm'))||0,pm=parseFloat(gv('d04c-pm'))||0;
+  return`<div style="font-family:Arial,sans-serif;font-size:10px;color:#000;background:white;width:216mm;min-height:279mm;padding:14mm 16mm;box-sizing:border-box;display:flex;flex-direction:column">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
+    <img src="${L64}" style="height:36px;object-fit:contain">
+    <div style="font-size:14px;font-weight:bold;text-align:center;flex:1;padding:0 12px">ETICOM S.A de C.V.</div>
+    <div style="font-size:9px"><b>Fecha:</b> <span style="border:1px solid #000;padding:2px 10px">${r.fecha}</span></div>
+  </div>
+  <div style="font-size:13px;font-weight:bold;margin-bottom:3px">Formato para la Revisión de Rechazos Externos</div>
+  <div style="border-top:2.5px solid #cc0000;margin-bottom:3px"></div>
+  <div style="text-align:right;font-size:9px;font-weight:bold;margin-bottom:8px">PRO-SGC-04-C &nbsp;·&nbsp; Producto ${p.num} — Lote ${p.lote}</div>
+  <table style="width:100%;border-collapse:collapse;margin-bottom:4px">
+    <tr><td style="font-size:10px;font-weight:bold;padding:3px 5px;width:26%">Cliente</td><td style="border:1px solid #000;padding:3px 7px;font-size:10px;width:34%">${r.cliente}</td><td style="width:2%"></td><td style="font-size:10px;font-weight:bold;padding:3px 5px;width:20%">No. general de queja</td><td style="border:1px solid #000;padding:3px 7px;font-size:10px">${r.folio}</td></tr>
+    <tr><td style="font-size:10px;font-weight:bold;padding:3px 5px">Nombre de la Etiqueta</td><td style="border:1px solid #000;padding:3px 7px;font-size:9px">${p.nombre}</td><td></td><td style="font-size:10px;font-weight:bold;padding:3px 5px">Cantidad final</td><td style="border:1px solid #000;padding:3px 7px;font-size:10px">${gv('d04c-cfi')}</td></tr>
+    <tr><td style="font-size:10px;font-weight:bold;padding:3px 5px">Gerente de Proyecto</td><td style="border:1px solid #000;padding:3px 7px;font-size:10px">${r.vendedor}</td><td></td><td style="font-size:10px;font-weight:bold;padding:3px 5px">Pedido (lote)</td><td style="border:1px solid #000;padding:3px 7px;font-size:10px">${p.lote}</td></tr>
+  </table>
+  <div style="border-top:2.5px solid #cc0000;margin-bottom:5px"></div>
+  <div style="display:flex;gap:24px;margin-bottom:8px;font-size:10px">
+    <span><b>Cantidad reportada:</b> ${p.cantidad}</span>
+    <span><b>Cantidad recibida:</b> ${gv('d04c-cre')}</span>
+    <span><b>Factura/Rem.:</b> ${p.factura}</span>
+    <span><b>Código:</b> ${p.codigo}</span>
+  </div>
+  <table style="width:100%;border-collapse:collapse;border:1px solid #000;margin-bottom:6px"><tr><td style="width:24%;font-size:10px;font-weight:bold;padding:4px 6px;border-right:1px solid #000;vertical-align:top;background:#f5f5f5">Descripción general del rechazo</td><td style="padding:5px 8px;font-size:10px">${p.desc}</td></tr></table>
+  <div style="border:2px solid #cc0000;background:#fff8e1;padding:8px 14px;font-size:11px;font-weight:bold;color:#cc0000;text-align:center;margin-bottom:6px;border-radius:3px">⚠ LA MUESTRA CRÍTICA ESTÁ PEGADA AL REVERSO DEL FORMATO</div>
+  <table style="width:100%;border-collapse:collapse;border:1px solid #000;margin-bottom:8px"><tr><td style="width:24%;font-size:10px;font-weight:bold;padding:4px 6px;border-right:1px solid #000;vertical-align:top;background:#f5f5f5">Conclusión del proceso de revisión</td><td style="padding:5px 8px;font-size:10px;min-height:36px">${gv('d04c-co')}</td></tr></table>
+  <table style="width:100%;border-collapse:collapse;border:1px solid #000;margin-bottom:10px"><tr><td style="font-size:10px;font-weight:bold;padding:4px 7px;border-right:1px solid #000;width:13%;background:#f5f5f5">Se requiere</td><td style="padding:4px 8px;font-size:10px;width:36%;border-right:1px solid #000">${gv('d04c-sr')}</td><td style="font-size:10px;font-weight:bold;padding:4px 7px;border-right:1px solid #000;width:13%;background:#f5f5f5">Se emite</td><td style="padding:4px 8px;font-size:10px">${gv('d04c-se')}</td></tr></table>
+  <div style="display:flex;justify-content:space-between;margin-bottom:14px">
+    <div style="text-align:center;font-size:10px;flex:1"><div style="font-weight:bold;margin-bottom:22px">Autoriza Revisión</div><div style="display:flex;justify-content:space-around"><div><div style="border-top:1px solid #000;width:90px;margin:0 auto 3px"></div>Fecha</div><div><div style="border-top:1px solid #000;width:90px;margin:0 auto 3px"></div>Firma</div></div></div>
+    <div style="text-align:center;font-size:10px;flex:1"><div style="font-weight:bold;margin-bottom:22px">Recibe para Revisión</div><div style="display:flex;justify-content:space-around"><div><div style="border-top:1px solid #000;width:90px;margin:0 auto 3px"></div>Fecha</div><div><div style="border-top:1px solid #000;width:90px;margin:0 auto 3px"></div>Firma</div></div></div>
+  </div>
+  <div style="display:flex;gap:14px;margin-top:auto">
+    <div style="border:1px solid #000;padding:8px 12px;font-size:10px;flex:1"><div><b>Autorizo N.C. Por:</b> ${ml||'_________'} Millares</div><div style="margin-top:20px;border-top:1px solid #000;padding-top:5px;text-align:center">Firma</div></div>
+    <div style="border:1px solid #000;padding:8px 12px;font-size:10px;flex:1.2"><div><b>Costo por millar:</b> &nbsp;$${cm.toFixed(2)}</div><div style="margin-top:5px"><b>Precio por millar:</b> &nbsp;$${pm.toFixed(2)}</div><div style="margin-top:5px;padding-top:5px;border-top:1px solid #ccc;font-weight:bold"><b>Costo total de rechazo:</b> &nbsp;$${(ml*cm).toFixed(2)}</div></div>
+  </div>
+</div>`;
+}
+
+function build04e(){
+  const m4=document.getElementById('m04e');
+  const r=rechazos.find(x=>x.folio===m4.dataset.folio);
+  const p=r.productos[parseInt(m4.dataset.pi)];
+  const tipo=document.querySelector('input[name="eti"]:checked')?.value||'Externo';
+  return`<div style="font-family:Arial,sans-serif;font-size:10px;color:#000;background:white;width:216mm;min-height:279mm;padding:14mm 16mm;box-sizing:border-box;display:flex;flex-direction:column">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+    <img src="${L64}" style="height:36px;object-fit:contain">
+    <div><div style="font-size:13px;font-weight:bold">ETICOM S.A de C.V.</div><div style="font-size:8px;color:#555">Etiquetas y Empaque Flexible</div></div>
+    <div style="flex:1;text-align:center;font-size:13px;font-weight:bold">Autorización de Reproceso/Retrabajo</div>
+    <div style="font-size:10px;font-weight:bold;white-space:nowrap">PRO-SGC-04-E</div>
+  </div>
+  <div style="border-top:2.5px solid #cc0000;margin-bottom:8px"></div>
+  <div style="text-align:right;font-size:9px;font-weight:bold;margin-bottom:8px">Producto ${p.num} — Lote ${p.lote}</div>
+  <table style="width:100%;border-collapse:collapse;margin-bottom:8px">
+    <tr><td style="font-size:10px;font-weight:bold;padding:3px 4px;width:22%">Fecha:</td><td style="border:1px solid #000;padding:3px 8px;font-size:10px;width:28%">${r.fecha}</td><td style="font-size:10px;font-weight:bold;padding:3px 4px;width:10%;text-align:center">Tipo:</td><td style="padding:3px 8px;font-size:10px"><span style="border:1px solid #000;padding:1px 5px;margin-right:8px">${tipo==='Interno'?'✓':' '}</span>Interno &nbsp;&nbsp;<span style="border:1px solid #000;padding:1px 5px;margin-right:8px">${tipo==='Externo'?'✓':' '}</span>Externo</td></tr>
+    <tr><td style="font-size:10px;font-weight:bold;padding:3px 4px">Cliente:</td><td colspan="3" style="border:1px solid #000;padding:3px 8px;font-size:10px">${r.cliente}</td></tr>
+    <tr><td style="font-size:10px;font-weight:bold;padding:3px 4px">Nombre de la Etiqueta:</td><td colspan="3" style="border:1px solid #000;padding:3px 8px;font-size:9px">${p.nombre}</td></tr>
+    <tr><td style="font-size:10px;font-weight:bold;padding:3px 4px">Pedido (lote):</td><td style="border:1px solid #000;padding:3px 8px;font-size:10px">${p.lote}</td><td style="font-size:10px;font-weight:bold;padding:3px 4px;text-align:center">Cantidad:</td><td style="border:1px solid #000;padding:3px 8px;font-size:10px">${p.cantidad}</td></tr>
+  </table>
+  <table style="width:100%;border-collapse:collapse;border:1px solid #000;margin-bottom:8px"><tr><td style="width:22%;font-size:10px;font-weight:bold;padding:4px 6px;border-right:1px solid #000;vertical-align:top;background:#f5f5f5">Descripción general:</td><td style="padding:6px 8px;font-size:10px;min-height:60px">${gv('d04e-de')}</td></tr></table>
+  <div style="flex:1;display:flex;flex-direction:column">
+    <div style="font-size:10px;font-weight:bold;margin-bottom:5px">NOTAS:</div>
+    <div style="flex:1;border:1px solid #000;padding:8px;font-size:10px;min-height:160px">${gv('d04e-no')}</div>
+  </div>
+  <div style="display:flex;justify-content:flex-end;margin-top:20px">
+    <div style="text-align:center;font-size:10px;width:180px"><div style="border-top:1px solid #000;margin-bottom:4px"></div><div style="font-weight:bold">Autoriza</div><div style="border-top:1px solid #000;margin-top:20px;margin-bottom:4px"></div><div>Firma</div></div>
+  </div>
+</div>`;
+}
+
+function prev04c(){document.getElementById('prc').innerHTML=build04c();document.getElementById('prtb').textContent='PRO-SGC-04-C — Vista previa';cM('m04c');document.getElementById('prbg').classList.add('open');}
+function prev04e(){document.getElementById('prc').innerHTML=build04e();document.getElementById('prtb').textContent='PRO-SGC-04-E — Vista previa';cM('m04e');document.getElementById('prbg').classList.add('open');}
+function print04c(){prev04c();setTimeout(doPrint,350);}
+function print04e(){prev04e();setTimeout(doPrint,350);}
+function doPrint(){
+  const content=document.getElementById('prc').innerHTML;
+  const title=document.getElementById('prtb').textContent;
+  const win=window.open('','_blank','width=860,height=1100');
+  win.document.write(`<!DOCTYPE html><html><head><title>${title}</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;font-size:10px;color:#000;background:white}table{border-collapse:collapse}@media print{@page{margin:0;size:letter portrait}body{margin:0;padding:0}}</style></head><body>${content}<script>window.onload=function(){window.print();}<\/script></body></html>`);
+  win.document.close();
+}
+function closePR(){document.getElementById('prbg').classList.remove('open');}
+
+// ===== LIGHTBOX =====
+function openLBUpload(i){LBF=EF.map(f=>({name:f.file.name,icon:f.info.icon,lbl:f.info.lbl,url:f.url}));LBI=i;renderLB();document.getElementById('lbx').classList.add('open');}
+function openLBCase(evs,i){
+  const parsed=typeof evs==='string'?JSON.parse(evs.replace(/'/g,'"')):evs;
+  LBF=parsed.map(e=>({name:e.name,icon:e.icon,lbl:ftI(e.name).lbl,url:e.url||null}));
+  LBI=i;renderLB();document.getElementById('lbx').classList.add('open');
+}
+function renderLB(){
+  const f=LBF[LBI];
+  document.getElementById('lbnm').textContent=f.name;
+  document.getElementById('lbco').textContent=`${LBI+1} / ${LBF.length}`;
+  document.getElementById('lbpv').style.display=LBF.length>1?'':'none';
+  document.getElementById('lbnx').style.display=LBF.length>1?'':'none';
+  document.getElementById('lbc2').innerHTML=f.url
+    ?`<img class="lbi" src="${f.url}" alt="${f.name}">`
+    :`<div class="lbpl"><div class="lbpl-ic">${f.icon}</div><div style="font-size:14px;opacity:.8">${f.name}</div><div style="font-size:11px;opacity:.5">${f.lbl}</div></div>`;
+}
+function lbNav(d){LBI=(LBI+d+LBF.length)%LBF.length;renderLB();}
+function closeLB(){document.getElementById('lbx').classList.remove('open');}
+function lbBg(e){if(e.target===document.getElementById('lbx'))closeLB();}
+document.addEventListener('keydown',e=>{
+  if(!document.getElementById('lbx').classList.contains('open'))return;
+  if(e.key==='ArrowLeft')lbNav(-1);if(e.key==='ArrowRight')lbNav(1);if(e.key==='Escape')closeLB();
+});
+
+// ===== MODALES =====
+function oM(id){document.getElementById(id).classList.add('open');}
+function cM(id){document.getElementById(id).classList.remove('open');}
+</script>
+</body>
+</html>
