@@ -180,13 +180,13 @@ textarea{resize:vertical;min-height:60px}
 <!-- ===== SUPABASE SDK ===== -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-// ============================================================
-// CONFIGURACIÓN — reemplazar con tus valores de Supabase
-// ============================================================
-const SUPABASE_URL = https://sapjrbqsjpwosxxlodwa.supabase.co/rest/v1/;         // ej: https://abcdef.supabase.co
-const SUPABASE_ANON_KEY = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhcGpyYnFzanB3b3N4eGxvZHdhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NDY4MzUsImV4cCI6MjA5MjUyMjgzNX0.cPR4ULaVVU-DVB6lm2ckY9JCwKisZcLL-322HjiMc3I; // Project Settings > API > anon key
+// ==============================================================
+// CONFIGURACION - Reemplazar con tus valores reales de Supabase
+// ==============================================================
+const SUPABASE_URL = https://sapjrbqsjpwosxxlodwa.supabase.co/rest/v1/;
+const SUPABASE_ANON_KEY = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhcGpyYnFzanB3b3N4eGxvZHdhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NDY4MzUsImV4cCI6MjA5MjUyMjgzNX0.cPR4ULaVVU-DVB6lm2ckY9JCwKisZcLL-322HjiMc3I;
 
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 </script>
 
 <!-- LOGO B64 -->
@@ -573,34 +573,6 @@ async function cargarUsuarios(){
   if(data) usuarios=data.map(u=>({...u, pass:'***', perfil:u.perfil}));
 }
 
-let rechazos=[
-  {folio:'RCH-00892',cliente:'Ma. Lourdes Mendoza',vendedor:'Rodrigo Mejia',email:'vendedor@eticom.mx',mesa:'Stefany Ramírez',
-   tipoProd:'Etiqueta',
-   productos:[
-     {num:1,tipoProd:'Etiqueta',nombre:'M15572 ETIQ 946ML F. PETRONAS SYNTIUM 500 SAE 20W50 / 5K',lote:'145731-01',partida:'1',factura:'152923',cantidad:'3K',codigo:'300326 14',desc:'Se invirtieron los colores y las cantidades no coinciden con la especificación.'},
-     {num:2,tipoProd:'Etiqueta',nombre:'M15573 ETIQ 946ML R. PETRONAS SYNTIUM 500 SAE 20W50 / 5K',lote:'145731-02',partida:'2',factura:'153264',cantidad:'3K',codigo:'300326 15',desc:'Mismo defecto que partida 1 — inversión de colores CYMK.'},
-     {num:3,tipoProd:'Etiqueta',nombre:'ETIQ 19L PETRONAS URANIA 3000 SAE 15W40 API / 1K',lote:'145886-03',partida:'3',factura:'153264',cantidad:'1K',codigo:'M157602',desc:'Texto ilegible en zona de datos técnicos.'},
-   ],
-   tipo:'RECHAZO',fecha:'20/04/2026',estado:'En proceso',causa:'Calibración de equipo',accion:'Reimpresión autorizada',
-   comentario:'Se detectó desviación en valores CYMK en prensa #2. Reimpresión programada para mañana.',
-   evidencias:[{name:'foto_rechazo_frontal.jpg',icon:'🖼',isImg:false,url:null},{name:'video_defecto_color.mp4',icon:'🎥',isImg:false,url:null},{name:'muestra_etiqueta.png',icon:'🖼',isImg:false,url:null}],
-   timeline:[{t:'Rechazo registrado por Rodrigo Mejia',f:'20/04/2026 · 10:05',c:'#7C3AED'},{t:'Calidad actualizó: En proceso · Reimpresión autorizada',f:'21/04/2026 · 09:30',c:'#D97706'}]},
-
-  {folio:'RCH-00891',cliente:'Distribuidora Norte S.A.',vendedor:'Rodrigo Mejia',email:'vendedor@eticom.mx',mesa:'Carlos Torres',
-   tipoProd:'Empaque Flexible',
-   productos:[{num:1,tipoProd:'Empaque Flexible',nombre:'BOLSA ACEITE MINERAL 1L',lote:'145600-01',partida:'1',factura:'152800',cantidad:'2K',codigo:'DN-EF-001',desc:'Color fuera de especificación en pantone de marca.'}],
-   tipo:'RECHAZO',fecha:'18/04/2026',estado:'Abierto',causa:'—',accion:'—',comentario:'',
-   evidencias:[{name:'muestra_bolsa.png',icon:'🖼',isImg:false,url:null}],
-   timeline:[{t:'Rechazo registrado por Rodrigo Mejia',f:'18/04/2026 · 14:20',c:'#7C3AED'}]},
-
-  {folio:'RCH-00890',cliente:'Lácteos del Sur',vendedor:'Ana Torres',email:'ana@eticom.mx',mesa:'María López',
-   tipoProd:'Caja Plegadiza',
-   productos:[{num:1,tipoProd:'Caja Plegadiza',nombre:'CAJA LECHE ENTERA 1L PREMIUM',lote:'145500-01',partida:'1',factura:'152700',cantidad:'5K',codigo:'LS-CJ-001',desc:'Adhesivo defectuoso — cajas no arman correctamente.'}],
-   tipo:'RECHAZO',fecha:'15/04/2026',estado:'Cerrado',causa:'Falla de material',accion:'Nota de crédito emitida',
-   comentario:'Caso resuelto. Nota de crédito No. 0234 emitida y aceptada por cliente.',
-   evidencias:[],
-   timeline:[{t:'Rechazo registrado por Ana Torres',f:'15/04/2026 · 11:00',c:'#7C3AED'},{t:'Calidad investigó: Falla de material identificada',f:'16/04/2026',c:'#D97706'},{t:'Nota de crédito emitida · Caso cerrado',f:'17/04/2026',c:'#16A34A'}]},
-];
 
 // ===== AUTH (Supabase) =====
 async function doLogin(){
