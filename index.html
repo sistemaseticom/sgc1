@@ -176,7 +176,7 @@ textarea{resize:vertical;min-height:60px}
 </head>
 <body>
 
-
+  
 <!-- ===== SUPABASE SDK ===== -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
@@ -509,7 +509,7 @@ const L64='data:image/jpeg;base64,/9j/4AAQSkZJRgABAgAAZABkAAD/7AARRHVja3kAAQAEAA
 // ===== INIT =====
 window.addEventListener('DOMContentLoaded', async ()=>{
   ['ll','vl','cl'].forEach(id=>{const el=document.getElementById(id);if(el)el.src=L64;});
-  // Verificar sesión existente
+  // Verificar sesion existente
   const { data: { session } } = await sb.auth.getSession();
   if(session) await loginConSesion(session.user);
 });
@@ -518,7 +518,7 @@ const TODAY=new Date().toISOString().split('T')[0];
 let CU=null,CC=null,PC=0,TS='',EF=[];
 let LBF=[],LBI=0;
 
-// ===== CATÁLOGOS (desde Supabase) =====
+// ===== CATALOGOS (desde Supabase) =====
 let cats={ tipoProd:[], mesaControl:[] };
 
 async function cargarCats(){
@@ -559,7 +559,7 @@ async function cargarRechazos(){
       name: e.nombre, icon: e.icono, isImg: e.es_imagen, url: e.storage_url
     })),
     timeline: (r.timeline||[]).sort((a,b)=>new Date(a.fecha_registro)-new Date(b.fecha_registro)).map(t=>({
-      t: t.texto + (t.mensaje_calidad ? '\n💬 "'+t.mensaje_calidad+'"' : ''),
+      t: t.texto + (t.mensaje_calidad ? '\n "'+t.mensaje_calidad+'"' : ''),
       f: new Date(t.fecha_registro).toLocaleString('es-MX'),
       c: t.color
     }))
@@ -578,18 +578,18 @@ async function cargarUsuarios(){
 async function doLogin(){
   const email=document.getElementById('lu').value.trim();
   const pass=document.getElementById('lp').value.trim();
-  document.getElementById('le').textContent='Iniciando sesión...';
+  document.getElementById('le').textContent='Iniciando sesion...';
   document.getElementById('le').style.display='block';
   const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
   if(error){
-    document.getElementById('le').textContent='Usuario o contraseña incorrectos';
+    document.getElementById('le').textContent='Usuario o contrasena incorrectos';
     return;
   }
   document.getElementById('le').style.display='none';
   await loginConSesion(data.user);
 }
 async function qL(pf){
-  // Acceso rápido demo — solo funciona con usuarios de prueba configurados
+  // Acceso rapido demo - solo funciona con usuarios de prueba configurados
   const demos = {
     vendedor: {email:'vendedor@eticom.mx', password:'1234eticom'},
     calidad:  {email:'calidad@eticom.mx',  password:'1234eticom'}
@@ -636,10 +636,10 @@ function bH(e){
   if(e==='Abierto')return'<span class="badge b-ab">Abierto</span>';
   if(e==='En proceso')return'<span class="badge b-pr">En proceso</span>';
   if(e==='Cerrado')return'<span class="badge b-cl">Cerrado</span>';
-  return'<span class="badge b-nu">Recién enviado</span>';
+  return'<span class="badge b-nu">Recien enviado</span>';
 }
 function evC(ev){return ev.length?`<span style="font-size:11px;color:var(--text2);font-weight:500">${ev.length} archivo${ev.length!==1?'s':''}</span>`:'<span style="font-size:11px;color:var(--text3)">Sin evidencias</span>';}
-function ftI(name){const e=name.split('.').pop().toLowerCase();if(['jpg','jpeg','png','gif','webp','heic','bmp','svg'].includes(e))return{cls:'ep-i',lbl:'IMG',icon:'🖼',isImg:true};if(['mp4','mov','avi','mkv','wmv','m4v'].includes(e))return{cls:'ep-v',lbl:'VID',icon:'🎥',isImg:false};if(['mp3','m4a','wav','ogg','aac'].includes(e))return{cls:'ep-a',lbl:'AUD',icon:'🎵',isImg:false};if(['pdf','doc','docx','xls','xlsx','ppt','pptx'].includes(e))return{cls:'ep-d',lbl:e.toUpperCase(),icon:'📄',isImg:false};return{cls:'ep-o',lbl:e.toUpperCase()||'?',icon:'📁',isImg:false};}
+function ftI(name){const e=name.split('.').pop().toLowerCase();if(['jpg','jpeg','png','gif','webp','heic','bmp','svg'].includes(e))return{cls:'ep-i',lbl:'IMG',icon:'',isImg:true};if(['mp4','mov','avi','mkv','wmv','m4v'].includes(e))return{cls:'ep-v',lbl:'VID',icon:'',isImg:false};if(['mp3','m4a','wav','ogg','aac'].includes(e))return{cls:'ep-a',lbl:'AUD',icon:'',isImg:false};if(['pdf','doc','docx','xls','xlsx','ppt','pptx'].includes(e))return{cls:'ep-d',lbl:e.toUpperCase(),icon:'',isImg:false};return{cls:'ep-o',lbl:e.toUpperCase()||'?',icon:'',isImg:false};}
 function fmtSz(b){if(b<1024)return b+'B';if(b<1048576)return Math.round(b/1024)+'KB';return(b/1048576).toFixed(1)+'MB';}
 function gv(id){return(document.getElementById(id)||{}).value||'';}
 function gt(id){return(document.getElementById(id)||{}).textContent||'';}
@@ -667,11 +667,11 @@ function renderVD(){
     <tr class="cr" onclick="vVerC('${r.folio}')">
       <td style="font-family:monospace;font-size:11px;font-weight:600">${r.folio}</td>
       <td style="font-weight:500">${r.cliente}</td>
-      <td><span class="badge b-tp">${r.tipoProd||'—'}</span></td>
+      <td><span class="badge b-tp">${r.tipoProd||'-'}</span></td>
       <td>${evC(r.evidencias)}</td>
       <td>${r.fecha}</td>
       <td>${bH(r.estado)}</td>
-      <td>${r.comentario?`<span class="notif-pill">● Calidad actualizó</span>`:`<span style="font-size:11px;color:var(--text3)">Sin movimientos</span>`}</td>
+      <td>${r.comentario?`<span class="notif-pill">* Calidad actualizo</span>`:`<span style="font-size:11px;color:var(--text3)">Sin movimientos</span>`}</td>
     </tr>`).join('');
 }
 
@@ -682,12 +682,12 @@ function renderVM(){
     <tr class="cr" onclick="vVerC('${r.folio}')">
       <td style="font-family:monospace;font-size:11px;font-weight:600">${r.folio}</td>
       <td style="font-weight:500">${r.cliente}</td>
-      <td><span class="badge b-tp">${r.tipoProd||'—'}</span></td>
+      <td><span class="badge b-tp">${r.tipoProd||'-'}</span></td>
       <td>${evC(r.evidencias)}</td>
       <td>${r.tipo}</td>
       <td>${r.fecha}</td>
       <td>${bH(r.estado)}</td>
-      <td>${r.comentario?`<span style="font-size:11px;color:var(--blue);font-weight:500">↑ Calidad actualizó</span>`:`<span style="font-size:11px;color:var(--text3)">Sin movimientos</span>`}</td>
+      <td>${r.comentario?`<span style="font-size:11px;color:var(--blue);font-weight:500">^ Calidad actualizo</span>`:`<span style="font-size:11px;color:var(--text3)">Sin movimientos</span>`}</td>
     </tr>`).join('');
 }
 
@@ -709,28 +709,28 @@ function vVerC(folio){
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
       <div class="card"><div class="ct">Datos del caso</div>
         <div class="dr"><span class="dl">Cliente</span><span style="font-weight:500">${r.cliente}</span></div>
-        <div class="dr"><span class="dl">Tipo producto</span><span><span class="badge b-tp">${r.tipoProd||'—'}</span></span></div>
+        <div class="dr"><span class="dl">Tipo producto</span><span><span class="badge b-tp">${r.tipoProd||'-'}</span></span></div>
         <div class="dr"><span class="dl">Tipo NC</span><span>${r.tipo}</span></div>
         <div class="dr"><span class="dl">Productos</span><span>${r.productos.length}</span></div>
-        <div class="dr"><span class="dl">Mesa de control</span><span>${r.mesa||'—'}</span></div>
+        <div class="dr"><span class="dl">Mesa de control</span><span>${r.mesa||'-'}</span></div>
         <div class="dr"><span class="dl">Fecha</span><span>${r.fecha}</span></div>
         <div class="dr"><span class="dl">Estado</span><span>${bH(r.estado)}</span></div>
       </div>
       <div class="card"><div class="ct">Respuesta de calidad</div>
-        <div class="dr"><span class="dl">Causa raíz</span><span>${r.causa}</span></div>
-        <div class="dr"><span class="dl">Acción tomada</span><span>${r.accion}</span></div>
-        ${r.comentario?`<div style="margin-top:12px;padding:12px;background:var(--blue-bg);border:1px solid var(--blue-border);border-radius:8px;font-size:12px;color:var(--blue-text)">💬 <strong>Mensaje de Calidad:</strong><br>${r.comentario}</div>`:'<div style="font-size:12px;color:var(--text3);margin-top:10px;padding:12px;background:var(--bg);border-radius:8px">Sin comentarios aún — Calidad está revisando tu caso.</div>'}
+        <div class="dr"><span class="dl">Causa raiz</span><span>${r.causa}</span></div>
+        <div class="dr"><span class="dl">Accion tomada</span><span>${r.accion}</span></div>
+        ${r.comentario?`<div style="margin-top:12px;padding:12px;background:var(--blue-bg);border:1px solid var(--blue-border);border-radius:8px;font-size:12px;color:var(--blue-text)"> <strong>Mensaje de Calidad:</strong><br>${r.comentario}</div>`:'<div style="font-size:12px;color:var(--text3);margin-top:10px;padding:12px;background:var(--bg);border-radius:8px">Sin comentarios aun - Calidad esta revisando tu caso.</div>'}
       </div>
     </div>
-    ${evH?`<div class="card"><div class="ct">Evidencias adjuntas (${r.evidencias.length} archivos) <span style="font-size:11px;color:var(--text3);font-weight:400">— clic para ver en pantalla completa</span></div>${evH}</div>`:''}
-    <div class="card"><div class="ct">Línea de tiempo</div>${tlH}</div>`;
+    ${evH?`<div class="card"><div class="ct">Evidencias adjuntas (${r.evidencias.length} archivos) <span style="font-size:11px;color:var(--text3);font-weight:400">- clic para ver en pantalla completa</span></div>${evH}</div>`:''}
+    <div class="card"><div class="ct">Linea de tiempo</div>${tlH}</div>`;
   vNav('c',null);document.getElementById('vn2').classList.add('active');
 }
 
 // ===== NUEVO RECHAZO =====
 function poblarMesa(){
   const sel=document.getElementById('nv1');
-  sel.innerHTML='<option value="">— Seleccionar persona —</option>'+cats.mesaControl.map(p=>`<option value="${p}">${p}</option>`).join('');
+  sel.innerHTML='<option value="">- Seleccionar persona -</option>'+cats.mesaControl.map(p=>`<option value="${p}">${p}</option>`).join('');
 }
 function initN(){
   PC=0;TS='';
@@ -752,10 +752,10 @@ function addP(){
   div.innerHTML=`
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
       <span style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.04em">Producto ${num}</span>
-      ${num>1?`<button class="btn btn-d" style="font-size:11px;padding:3px 10px" onclick="this.closest('.pb').remove();renumP()">✕ Eliminar</button>`:''}
+      ${num>1?`<button class="btn btn-d" style="font-size:11px;padding:3px 10px" onclick="this.closest('.pb').remove();renumP()">  Eliminar</button>`:''}
     </div>
     <div class="fr" style="margin-bottom:0">
-      <div class="fg"><label>Tipo de producto</label><select><option value="">— Seleccionar —</option>${tpOpts}</select></div>
+      <div class="fg"><label>Tipo de producto</label><select><option value="">- Seleccionar -</option>${tpOpts}</select></div>
       <div class="fg"><label>Nombre del producto</label><input type="text" placeholder="Nombre completo del producto"></div>
     </div>
     <div class="fr" style="margin-bottom:0">
@@ -763,14 +763,14 @@ function addP(){
       <div class="fg"><label>Partida</label><input type="text" placeholder="Ej: 2"></div>
     </div>
     <div class="fr" style="margin-bottom:0">
-      <div class="fg"><label>Factura / Remisión</label><input type="text" placeholder="Ej: 152923"></div>
+      <div class="fg"><label>Factura / Remision</label><input type="text" placeholder="Ej: 152923"></div>
       <div class="fg"><label>Cantidad reclamada</label><input type="text" placeholder="Ej: 3K"></div>
     </div>
     <div class="fr" style="margin-bottom:0">
-      <div class="fg"><label>Código del producto</label><input type="text" placeholder="Ej: 300326 14"></div>
+      <div class="fg"><label>Codigo del producto</label><input type="text" placeholder="Ej: 300326 14"></div>
       <div></div>
     </div>
-    <div class="fg"><label>Descripción del rechazo</label><textarea placeholder="Describe detalladamente el problema detectado en este producto..." rows="2"></textarea></div>`;
+    <div class="fg"><label>Descripcion del rechazo</label><textarea placeholder="Describe detalladamente el problema detectado en este producto..." rows="2"></textarea></div>`;
   document.getElementById('pc').appendChild(div);
 }
 function renumP(){document.querySelectorAll('#pc .pb').forEach((el,i)=>el.querySelector('span').textContent='Producto '+(i+1));}
@@ -783,18 +783,18 @@ function renderEG(){
   document.getElementById('eg').innerHTML=EF.map((f,i)=>{
     const{info,url}=f;
     const thumb=url?`<img src="${url}" alt="${f.file.name}">`:`<div class="etp"><div style="font-size:26px">${info.icon}</div><div style="font-size:10px;color:var(--text3);font-weight:600">${info.lbl}</div><div style="font-size:9px;color:var(--text3)">${fmtSz(f.file.size)}</div></div>`;
-    return`<div class="et" onclick="openLBUpload(${i})"><span class="epill ${info.cls}">${info.lbl}</span>${thumb}<div class="etn">${f.file.name}</div><button class="etd" onclick="event.stopPropagation();rmEF(${i})">✕</button></div>`;
+    return`<div class="et" onclick="openLBUpload(${i})"><span class="epill ${info.cls}">${info.lbl}</span>${thumb}<div class="etn">${f.file.name}</div><button class="etd" onclick="event.stopPropagation();rmEF(${i})"> </button></div>`;
   }).join('');
 }
 async function guardar(){
   const cliente=document.getElementById('nv3').value||'Cliente';
-  const mesa=document.getElementById('nv1').value||'—';
+  const mesa=document.getElementById('nv1').value||'-';
   const prods=Array.from(document.querySelectorAll('#pc .pb')).map((el,i)=>{
     const sels=el.querySelectorAll('select');
     const ins=el.querySelectorAll('input,textarea');
-    return{num:i+1,tipo_prod:sels[0]?.value||'—',nombre:ins[0]?.value||'—',lote:ins[1]?.value||'—',partida:ins[2]?.value||'—',factura:ins[3]?.value||'—',cantidad:ins[4]?.value||'—',codigo:ins[5]?.value||'—',descripcion:ins[6]?.value||'—'};
+    return{num:i+1,tipo_prod:sels[0]?.value||'-',nombre:ins[0]?.value||'-',lote:ins[1]?.value||'-',partida:ins[2]?.value||'-',factura:ins[3]?.value||'-',cantidad:ins[4]?.value||'-',codigo:ins[5]?.value||'-',descripcion:ins[6]?.value||'-'};
   });
-  const tipoProdPrinc=prods[0]?.tipo_prod||'—';
+  const tipoProdPrinc=prods[0]?.tipo_prod||'-';
   // Generar folio
   const { data: folioData } = await sb.rpc('generar_folio');
   const folio = folioData || ('RCH-'+String(Math.floor(Math.random()*90000)+10000));
@@ -805,7 +805,7 @@ async function guardar(){
     vendedor_nombre: CU.nombre, vendedor_email: CU.email,
     mesa_control: mesa, tipo_prod: tipoProdPrinc,
     tipo_nc: TS||'RECHAZO', fecha,
-    estado:'Abierto', causa:'—', accion:'—', comentario_calidad:''
+    estado:'Abierto', causa:'-', accion:'-', comentario_calidad:''
   }).select().single();
   if(errR){ alert('Error al guardar: '+errR.message); return; }
   // Insertar productos
@@ -835,7 +835,7 @@ async function guardar(){
   // Recargar datos
   await cargarRechazos();
   EF=[];renderVD();renderCD();renderCR();
-  alert(`✓ Rechazo ${folio} enviado exitosamente a Calidad.`);
+  alert(`OK Rechazo ${folio} enviado exitosamente a Calidad.`);
   initN();vNav('d',document.getElementById('vn0'));
 }
 
@@ -850,7 +850,7 @@ function renderCD(){
       <td style="font-family:monospace;font-size:11px;font-weight:600">${r.folio}</td>
       <td style="font-weight:500">${r.cliente}</td>
       <td>${r.vendedor}</td>
-      <td><span class="badge b-tp">${r.tipoProd||'—'}</span></td>
+      <td><span class="badge b-tp">${r.tipoProd||'-'}</span></td>
       <td>${evC(r.evidencias)}</td>
       <td>${r.fecha}</td>
       <td>${bH(r.estado)}</td>
@@ -863,7 +863,7 @@ function renderCR(){
       <td style="font-family:monospace;font-size:11px;font-weight:600">${r.folio}</td>
       <td style="font-weight:500">${r.cliente}</td>
       <td>${r.vendedor}</td>
-      <td><span class="badge b-tp">${r.tipoProd||'—'}</span></td>
+      <td><span class="badge b-tp">${r.tipoProd||'-'}</span></td>
       <td>${evC(r.evidencias)}</td>
       <td>${r.tipo}</td>
       <td>${r.fecha}</td>
@@ -890,11 +890,11 @@ function cVerC(folio){
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
         <div style="display:flex;align-items:center;gap:8px">
           <span style="font-size:12px;font-weight:700;color:var(--text2)">Producto ${p.num}</span>
-          <span class="badge b-tp">${p.tipoProd||r.tipoProd||'—'}</span>
+          <span class="badge b-tp">${p.tipoProd||r.tipoProd||'-'}</span>
         </div>
         <div style="display:flex;gap:6px">
-          <button class="btn btn-p" style="font-size:11px;padding:4px 12px" onclick="o04c('${folio}',${i})">📋 PRO-SGC-04-C</button>
-          <button class="btn btn-w" style="font-size:11px;padding:4px 12px" onclick="o04e('${folio}',${i})">🔄 PRO-SGC-04-E</button>
+          <button class="btn btn-p" style="font-size:11px;padding:4px 12px" onclick="o04c('${folio}',${i})"> PRO-SGC-04-C</button>
+          <button class="btn btn-w" style="font-size:11px;padding:4px 12px" onclick="o04e('${folio}',${i})"> PRO-SGC-04-E</button>
         </div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px">
@@ -904,7 +904,7 @@ function cVerC(folio){
       </div>
       <div style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;margin-bottom:2px">Nombre del producto</div>
       <div style="font-size:12px;font-weight:600;margin-bottom:6px">${p.nombre}</div>
-      <div style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;margin-bottom:2px">Descripción del rechazo</div>
+      <div style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;margin-bottom:2px">Descripcion del rechazo</div>
       <div style="font-size:12px;color:var(--text2)">${p.desc}</div>
     </div>`).join('');
   document.getElementById('ccb').innerHTML=`
@@ -912,30 +912,30 @@ function cVerC(folio){
       <div class="card"><div class="ct">Datos del caso</div>
         <div class="dr"><span class="dl">Cliente</span><span style="font-weight:500">${r.cliente}</span></div>
         <div class="dr"><span class="dl">Vendedor</span><span>${r.vendedor}</span></div>
-        <div class="dr"><span class="dl">Mesa de control</span><span>${r.mesa||'—'}</span></div>
-        <div class="dr"><span class="dl">Tipo producto</span><span><span class="badge b-tp">${r.tipoProd||'—'}</span></span></div>
+        <div class="dr"><span class="dl">Mesa de control</span><span>${r.mesa||'-'}</span></div>
+        <div class="dr"><span class="dl">Tipo producto</span><span><span class="badge b-tp">${r.tipoProd||'-'}</span></span></div>
         <div class="dr"><span class="dl">Tipo NC</span><span>${r.tipo}</span></div>
         <div class="dr"><span class="dl">Fecha</span><span>${r.fecha}</span></div>
         <div class="dr"><span class="dl">Estado</span><span>${bH(r.estado)}</span></div>
       </div>
-      <div class="card"><div class="ct">Análisis de calidad</div>
-        <div class="dr"><span class="dl">Causa raíz</span><span>${r.causa}</span></div>
-        <div class="dr"><span class="dl">Acción tomada</span><span>${r.accion}</span></div>
+      <div class="card"><div class="ct">Analisis de calidad</div>
+        <div class="dr"><span class="dl">Causa raiz</span><span>${r.causa}</span></div>
+        <div class="dr"><span class="dl">Accion tomada</span><span>${r.accion}</span></div>
         ${r.comentario?`<div style="margin-top:10px;font-size:12px;color:var(--text2)">Comentario enviado al vendedor:<br><span style="color:var(--text);font-style:italic">"${r.comentario}"</span></div>`:''}
-        <button class="btn btn-p" style="margin-top:14px;font-size:12px;width:100%" onclick="oAv('${folio}')">✏️ Registrar avance</button>
+        <button class="btn btn-p" style="margin-top:14px;font-size:12px;width:100%" onclick="oAv('${folio}')">   Registrar avance</button>
       </div>
     </div>
-    <div class="card"><div class="ct">Productos reportados (${r.productos.length}) — Generar documentos por producto</div>${prodsH}</div>
-    ${evH?`<div class="card"><div class="ct">Evidencias adjuntas (${r.evidencias.length}) — clic para ver en pantalla completa</div>${evH}</div>`:''}
-    <div class="card"><div class="ct">Línea de tiempo</div>${tlH}</div>`;
+    <div class="card"><div class="ct">Productos reportados (${r.productos.length}) - Generar documentos por producto</div>${prodsH}</div>
+    ${evH?`<div class="card"><div class="ct">Evidencias adjuntas (${r.evidencias.length}) - clic para ver en pantalla completa</div>${evH}</div>`:''}
+    <div class="card"><div class="ct">Linea de tiempo</div>${tlH}</div>`;
   cNav('c',null);document.getElementById('cn1').classList.add('active');
 }
 
-// ===== AVANCE — FIX SINCRONIZACIÓN =====
+// ===== AVANCE - FIX SINCRONIZACION =====
 function oAv(folio){
   CC=folio;
   const r=rechazos.find(x=>x.folio===folio);
-  document.getElementById('avf-sub').textContent=`Folio: ${folio} · ${r?.cliente||''}`;
+  document.getElementById('avf-sub').textContent=`Folio: ${folio}   ${r?.cliente||''}`;
   if(r)document.getElementById('ave').value=r.estado;
   document.getElementById('avc').value='';
   document.getElementById('ava').value='';
@@ -955,7 +955,7 @@ async function guardarAv(){
   }).eq('folio', CC);
   if(errU){ alert('Error al guardar avance: '+errU.message); return; }
   // Insertar en timeline
-  const tlTexto=`Calidad actualizó: ${estado} · ${accion}`;
+  const tlTexto=`Calidad actualizo: ${estado}   ${accion}`;
   await sb.from('timeline').insert({
     rechazo_id: r.id,
     texto: tlTexto,
@@ -967,16 +967,16 @@ async function guardarAv(){
   await cargarRechazos();
   renderCD();renderCR();renderVD();renderVM();
   if(document.getElementById('cp-c').classList.contains('active'))cVerC(CC);
-  alert(`✓ Avance guardado.\n\nFolio: ${CC}\nEstado: ${estado}\nEl vendedor puede ver la actualización en su dashboard.`);
+  alert(`OK Avance guardado.\n\nFolio: ${CC}\nEstado: ${estado}\nEl vendedor puede ver la actualizacion en su dashboard.`);
 }
 
-// ===== CATÁLOGOS =====
+// ===== CATALOGOS =====
 function renderCat(){
   document.getElementById('cat-tp-list').innerHTML=cats.tipoProd.length
-    ?cats.tipoProd.map(t=>`<div class="cat-item"><span>🏷 ${t}</span><button class="btn btn-d" style="font-size:11px;padding:2px 8px" onclick="delCat('tipoProd','${t}')">✕</button></div>`).join('')
+    ?cats.tipoProd.map(t=>`<div class="cat-item"><span> ${t}</span><button class="btn btn-d" style="font-size:11px;padding:2px 8px" onclick="delCat('tipoProd','${t}')"> </button></div>`).join('')
     :'<div style="font-size:12px;color:var(--text3);padding:10px 0">Sin elementos. Agrega el primero.</div>';
   document.getElementById('cat-mc-list').innerHTML=cats.mesaControl.length
-    ?cats.mesaControl.map(m=>`<div class="cat-item"><span>👤 ${m}</span><button class="btn btn-d" style="font-size:11px;padding:2px 8px" onclick="delCat('mesaControl','${m}')">✕</button></div>`).join('')
+    ?cats.mesaControl.map(m=>`<div class="cat-item"><span> ${m}</span><button class="btn btn-d" style="font-size:11px;padding:2px 8px" onclick="delCat('mesaControl','${m}')"> </button></div>`).join('')
     :'<div style="font-size:12px;color:var(--text3);padding:10px 0">Sin personas. Agrega la primera.</div>';
 }
 async function addCat(tipo){
@@ -991,7 +991,7 @@ async function addCat(tipo){
   await cargarCats();renderCat();
 }
 async function delCat(tipoDb, valor){
-  if(!confirm('¿Eliminar "'+valor+'" del catálogo?'))return;
+  if(!confirm('Eliminar "'+valor+'" del catalogo?'))return;
   await sb.from('catalogos').delete().eq('tipo', tipoDb).eq('valor', valor);
   await cargarCats();renderCat();
 }
@@ -1002,7 +1002,7 @@ function renderU(){
     <tr>
       <td style="font-weight:600">${u.nombre}</td>
       <td style="font-size:11px;color:var(--text3)">${u.email}</td>
-      <td><span class="rp ${u.perfil==='calidad'?'rp-c':'rp-v'}">${u.perfil==='calidad'?'Calidad · Admin':'Vendedor'}</span></td>
+      <td><span class="rp ${u.perfil==='calidad'?'rp-c':'rp-v'}">${u.perfil==='calidad'?'Calidad   Admin':'Vendedor'}</span></td>
       <td><span class="badge ${u.activo?'b-cl':'b-ab'}">${u.activo?'Activo':'Inactivo'}</span></td>
       <td><button class="btn-sm" onclick="togU('${u.id}',${u.activo})">${u.activo?'Desactivar':'Activar'}</button></td>
     </tr>`).join('');
@@ -1012,8 +1012,8 @@ async function crearU(){
   if(!n||!e||!pw){alert('Completa todos los campos');return;}
   // Crear en Supabase Auth
   const { error: errA } = await sb.auth.admin.createUser({ email:e, password:pw, email_confirm:true });
-  // Si no tienes service_role key, pide al usuario que se registre él mismo
-  // y luego tú lo agregas a la tabla usuarios manualmente
+  // Si no tienes service_role key, pide al usuario que se registre el mismo
+  // y luego tu lo agregas a la tabla usuarios manualmente
   const { error: errU } = await sb.from('usuarios').insert({ nombre:n, email:e, perfil:p });
   if(errU){ alert('Error: '+errU.message); return; }
   cM('mu');
@@ -1075,9 +1075,9 @@ function build04c(){
     <div style="font-size:14px;font-weight:bold;text-align:center;flex:1;padding:0 12px">ETICOM S.A de C.V.</div>
     <div style="font-size:9px"><b>Fecha:</b> <span style="border:1px solid #000;padding:2px 10px">${r.fecha}</span></div>
   </div>
-  <div style="font-size:13px;font-weight:bold;margin-bottom:3px">Formato para la Revisión de Rechazos Externos</div>
+  <div style="font-size:13px;font-weight:bold;margin-bottom:3px">Formato para la Revision de Rechazos Externos</div>
   <div style="border-top:2.5px solid #cc0000;margin-bottom:3px"></div>
-  <div style="text-align:right;font-size:9px;font-weight:bold;margin-bottom:8px">PRO-SGC-04-C &nbsp;·&nbsp; Producto ${p.num} — Lote ${p.lote}</div>
+  <div style="text-align:right;font-size:9px;font-weight:bold;margin-bottom:8px">PRO-SGC-04-C &nbsp; &nbsp; Producto ${p.num} - Lote ${p.lote}</div>
   <table style="width:100%;border-collapse:collapse;margin-bottom:4px">
     <tr><td style="font-size:10px;font-weight:bold;padding:3px 5px;width:26%">Cliente</td><td style="border:1px solid #000;padding:3px 7px;font-size:10px;width:34%">${r.cliente}</td><td style="width:2%"></td><td style="font-size:10px;font-weight:bold;padding:3px 5px;width:20%">No. general de queja</td><td style="border:1px solid #000;padding:3px 7px;font-size:10px">${r.folio}</td></tr>
     <tr><td style="font-size:10px;font-weight:bold;padding:3px 5px">Nombre de la Etiqueta</td><td style="border:1px solid #000;padding:3px 7px;font-size:9px">${p.nombre}</td><td></td><td style="font-size:10px;font-weight:bold;padding:3px 5px">Cantidad final</td><td style="border:1px solid #000;padding:3px 7px;font-size:10px">${gv('d04c-cfi')}</td></tr>
@@ -1088,15 +1088,15 @@ function build04c(){
     <span><b>Cantidad reportada:</b> ${p.cantidad}</span>
     <span><b>Cantidad recibida:</b> ${gv('d04c-cre')}</span>
     <span><b>Factura/Rem.:</b> ${p.factura}</span>
-    <span><b>Código:</b> ${p.codigo}</span>
+    <span><b>Codigo:</b> ${p.codigo}</span>
   </div>
-  <table style="width:100%;border-collapse:collapse;border:1px solid #000;margin-bottom:6px"><tr><td style="width:24%;font-size:10px;font-weight:bold;padding:4px 6px;border-right:1px solid #000;vertical-align:top;background:#f5f5f5">Descripción general del rechazo</td><td style="padding:5px 8px;font-size:10px">${p.desc}</td></tr></table>
-  <div style="border:2px solid #cc0000;background:#fff8e1;padding:8px 14px;font-size:11px;font-weight:bold;color:#cc0000;text-align:center;margin-bottom:6px;border-radius:3px">⚠ LA MUESTRA CRÍTICA ESTÁ PEGADA AL REVERSO DEL FORMATO</div>
-  <table style="width:100%;border-collapse:collapse;border:1px solid #000;margin-bottom:8px"><tr><td style="width:24%;font-size:10px;font-weight:bold;padding:4px 6px;border-right:1px solid #000;vertical-align:top;background:#f5f5f5">Conclusión del proceso de revisión</td><td style="padding:5px 8px;font-size:10px;min-height:36px">${gv('d04c-co')}</td></tr></table>
+  <table style="width:100%;border-collapse:collapse;border:1px solid #000;margin-bottom:6px"><tr><td style="width:24%;font-size:10px;font-weight:bold;padding:4px 6px;border-right:1px solid #000;vertical-align:top;background:#f5f5f5">Descripcion general del rechazo</td><td style="padding:5px 8px;font-size:10px">${p.desc}</td></tr></table>
+  <div style="border:2px solid #cc0000;background:#fff8e1;padding:8px 14px;font-size:11px;font-weight:bold;color:#cc0000;text-align:center;margin-bottom:6px;border-radius:3px">! LA MUESTRA CRITICA ESTA PEGADA AL REVERSO DEL FORMATO</div>
+  <table style="width:100%;border-collapse:collapse;border:1px solid #000;margin-bottom:8px"><tr><td style="width:24%;font-size:10px;font-weight:bold;padding:4px 6px;border-right:1px solid #000;vertical-align:top;background:#f5f5f5">Conclusion del proceso de revision</td><td style="padding:5px 8px;font-size:10px;min-height:36px">${gv('d04c-co')}</td></tr></table>
   <table style="width:100%;border-collapse:collapse;border:1px solid #000;margin-bottom:10px"><tr><td style="font-size:10px;font-weight:bold;padding:4px 7px;border-right:1px solid #000;width:13%;background:#f5f5f5">Se requiere</td><td style="padding:4px 8px;font-size:10px;width:36%;border-right:1px solid #000">${gv('d04c-sr')}</td><td style="font-size:10px;font-weight:bold;padding:4px 7px;border-right:1px solid #000;width:13%;background:#f5f5f5">Se emite</td><td style="padding:4px 8px;font-size:10px">${gv('d04c-se')}</td></tr></table>
   <div style="display:flex;justify-content:space-between;margin-bottom:14px">
-    <div style="text-align:center;font-size:10px;flex:1"><div style="font-weight:bold;margin-bottom:22px">Autoriza Revisión</div><div style="display:flex;justify-content:space-around"><div><div style="border-top:1px solid #000;width:90px;margin:0 auto 3px"></div>Fecha</div><div><div style="border-top:1px solid #000;width:90px;margin:0 auto 3px"></div>Firma</div></div></div>
-    <div style="text-align:center;font-size:10px;flex:1"><div style="font-weight:bold;margin-bottom:22px">Recibe para Revisión</div><div style="display:flex;justify-content:space-around"><div><div style="border-top:1px solid #000;width:90px;margin:0 auto 3px"></div>Fecha</div><div><div style="border-top:1px solid #000;width:90px;margin:0 auto 3px"></div>Firma</div></div></div>
+    <div style="text-align:center;font-size:10px;flex:1"><div style="font-weight:bold;margin-bottom:22px">Autoriza Revision</div><div style="display:flex;justify-content:space-around"><div><div style="border-top:1px solid #000;width:90px;margin:0 auto 3px"></div>Fecha</div><div><div style="border-top:1px solid #000;width:90px;margin:0 auto 3px"></div>Firma</div></div></div>
+    <div style="text-align:center;font-size:10px;flex:1"><div style="font-weight:bold;margin-bottom:22px">Recibe para Revision</div><div style="display:flex;justify-content:space-around"><div><div style="border-top:1px solid #000;width:90px;margin:0 auto 3px"></div>Fecha</div><div><div style="border-top:1px solid #000;width:90px;margin:0 auto 3px"></div>Firma</div></div></div>
   </div>
   <div style="display:flex;gap:14px;margin-top:auto">
     <div style="border:1px solid #000;padding:8px 12px;font-size:10px;flex:1"><div><b>Autorizo N.C. Por:</b> ${ml||'_________'} Millares</div><div style="margin-top:20px;border-top:1px solid #000;padding-top:5px;text-align:center">Firma</div></div>
@@ -1114,18 +1114,18 @@ function build04e(){
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
     <img src="${L64}" style="height:36px;object-fit:contain">
     <div><div style="font-size:13px;font-weight:bold">ETICOM S.A de C.V.</div><div style="font-size:8px;color:#555">Etiquetas y Empaque Flexible</div></div>
-    <div style="flex:1;text-align:center;font-size:13px;font-weight:bold">Autorización de Reproceso/Retrabajo</div>
+    <div style="flex:1;text-align:center;font-size:13px;font-weight:bold">Autorizacion de Reproceso/Retrabajo</div>
     <div style="font-size:10px;font-weight:bold;white-space:nowrap">PRO-SGC-04-E</div>
   </div>
   <div style="border-top:2.5px solid #cc0000;margin-bottom:8px"></div>
-  <div style="text-align:right;font-size:9px;font-weight:bold;margin-bottom:8px">Producto ${p.num} — Lote ${p.lote}</div>
+  <div style="text-align:right;font-size:9px;font-weight:bold;margin-bottom:8px">Producto ${p.num} - Lote ${p.lote}</div>
   <table style="width:100%;border-collapse:collapse;margin-bottom:8px">
-    <tr><td style="font-size:10px;font-weight:bold;padding:3px 4px;width:22%">Fecha:</td><td style="border:1px solid #000;padding:3px 8px;font-size:10px;width:28%">${r.fecha}</td><td style="font-size:10px;font-weight:bold;padding:3px 4px;width:10%;text-align:center">Tipo:</td><td style="padding:3px 8px;font-size:10px"><span style="border:1px solid #000;padding:1px 5px;margin-right:8px">${tipo==='Interno'?'✓':' '}</span>Interno &nbsp;&nbsp;<span style="border:1px solid #000;padding:1px 5px;margin-right:8px">${tipo==='Externo'?'✓':' '}</span>Externo</td></tr>
+    <tr><td style="font-size:10px;font-weight:bold;padding:3px 4px;width:22%">Fecha:</td><td style="border:1px solid #000;padding:3px 8px;font-size:10px;width:28%">${r.fecha}</td><td style="font-size:10px;font-weight:bold;padding:3px 4px;width:10%;text-align:center">Tipo:</td><td style="padding:3px 8px;font-size:10px"><span style="border:1px solid #000;padding:1px 5px;margin-right:8px">${tipo==='Interno'?'OK':' '}</span>Interno &nbsp;&nbsp;<span style="border:1px solid #000;padding:1px 5px;margin-right:8px">${tipo==='Externo'?'OK':' '}</span>Externo</td></tr>
     <tr><td style="font-size:10px;font-weight:bold;padding:3px 4px">Cliente:</td><td colspan="3" style="border:1px solid #000;padding:3px 8px;font-size:10px">${r.cliente}</td></tr>
     <tr><td style="font-size:10px;font-weight:bold;padding:3px 4px">Nombre de la Etiqueta:</td><td colspan="3" style="border:1px solid #000;padding:3px 8px;font-size:9px">${p.nombre}</td></tr>
     <tr><td style="font-size:10px;font-weight:bold;padding:3px 4px">Pedido (lote):</td><td style="border:1px solid #000;padding:3px 8px;font-size:10px">${p.lote}</td><td style="font-size:10px;font-weight:bold;padding:3px 4px;text-align:center">Cantidad:</td><td style="border:1px solid #000;padding:3px 8px;font-size:10px">${p.cantidad}</td></tr>
   </table>
-  <table style="width:100%;border-collapse:collapse;border:1px solid #000;margin-bottom:8px"><tr><td style="width:22%;font-size:10px;font-weight:bold;padding:4px 6px;border-right:1px solid #000;vertical-align:top;background:#f5f5f5">Descripción general:</td><td style="padding:6px 8px;font-size:10px;min-height:60px">${gv('d04e-de')}</td></tr></table>
+  <table style="width:100%;border-collapse:collapse;border:1px solid #000;margin-bottom:8px"><tr><td style="width:22%;font-size:10px;font-weight:bold;padding:4px 6px;border-right:1px solid #000;vertical-align:top;background:#f5f5f5">Descripcion general:</td><td style="padding:6px 8px;font-size:10px;min-height:60px">${gv('d04e-de')}</td></tr></table>
   <div style="flex:1;display:flex;flex-direction:column">
     <div style="font-size:10px;font-weight:bold;margin-bottom:5px">NOTAS:</div>
     <div style="flex:1;border:1px solid #000;padding:8px;font-size:10px;min-height:160px">${gv('d04e-no')}</div>
@@ -1136,8 +1136,8 @@ function build04e(){
 </div>`;
 }
 
-function prev04c(){document.getElementById('prc').innerHTML=build04c();document.getElementById('prtb').textContent='PRO-SGC-04-C — Vista previa';cM('m04c');document.getElementById('prbg').classList.add('open');}
-function prev04e(){document.getElementById('prc').innerHTML=build04e();document.getElementById('prtb').textContent='PRO-SGC-04-E — Vista previa';cM('m04e');document.getElementById('prbg').classList.add('open');}
+function prev04c(){document.getElementById('prc').innerHTML=build04c();document.getElementById('prtb').textContent='PRO-SGC-04-C - Vista previa';cM('m04c');document.getElementById('prbg').classList.add('open');}
+function prev04e(){document.getElementById('prc').innerHTML=build04e();document.getElementById('prtb').textContent='PRO-SGC-04-E - Vista previa';cM('m04e');document.getElementById('prbg').classList.add('open');}
 function print04c(){prev04c();setTimeout(doPrint,350);}
 function print04e(){prev04e();setTimeout(doPrint,350);}
 function doPrint(){
